@@ -8,11 +8,16 @@ namespace RePopCraftingStudio.Db
 {
    public class RepopDb
    {
-      private string _connStr = string.Empty;
+      //private string _connStr = string.Empty;
+      public string ConnectionString { get; set; }
 
-      public RepopDb( string connStr )
+      public RepopDb()
+         : this( string.Empty )
+      { }
+
+      public RepopDb( string connectionString )
       {
-         _connStr = connStr;
+         ConnectionString = connectionString;
       }
 
       public string GetComponentName( EntityWithComponentId entity )
@@ -138,9 +143,12 @@ namespace RePopCraftingStudio.Db
 
       private DataTable GetDataTable( string format, params object[] args )
       {
+         if ( string.IsNullOrEmpty( ConnectionString ) )
+            throw new InvalidOperationException( @"Connection string is null or empty." );
+
          DataTable table = new DataTable();
 
-         using ( SQLiteConnection connection = new SQLiteConnection( _connStr ) )
+         using ( SQLiteConnection connection = new SQLiteConnection( ConnectionString ) )
          {
             connection.Open();
             using ( SQLiteCommand command = new SQLiteCommand( connection ) )

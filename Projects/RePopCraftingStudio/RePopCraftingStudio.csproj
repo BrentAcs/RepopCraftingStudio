@@ -51,6 +51,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Db\Entities.cs" />
+    <Compile Include="Dialogs\ExceptionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ExceptionDialog.Designer.cs">
+      <DependentUpon>ExceptionDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\EntityListView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -68,6 +74,9 @@
     <Compile Include="RecipeResultsListViewController.cs" />
     <Compile Include="RecipeTreeViewController.cs" />
     <Compile Include="Db\RepopDb.cs" />
+    <EmbeddedResource Include="Dialogs\ExceptionDialog.resx">
+      <DependentUpon>ExceptionDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Forms;
 using RePopCrafting;
 using RePopCraftingStudio.Db;
@@ -20,7 +21,8 @@ namespace RePopCraftingStudio
 
       private void Form1_Load( object sender, EventArgs e )
       {
-         _db = new RepopDb( @"Data Source=C:\dev\RePopCrafting\db\repopdata.db3" );
+         //_db = new RepopDb( @"Data Source=C:\dev\RePopCrafting\db\repopdata.db3" );
+         _db = new RepopDb();
          _recipeTreeViewController = new RecipeTreeViewController( _db, recipeTreeView );
          _recipeResultsListViewController = new RecipeResultsListViewController( _db, recipeResultsListView );
 
@@ -46,7 +48,7 @@ namespace RePopCraftingStudio
          _recipeTreeViewController.Fill( _db.SelectRecipesForItem( item ) );
 
 
-         _db.BuildManifest(item.ItemId);
+         _db.BuildManifest( item.ItemId );
       }
 
       private void itemFilterTextBox_KeyUp( object sender, KeyEventArgs e )
@@ -79,7 +81,6 @@ namespace RePopCraftingStudio
          thePropertyGrid.SelectedObject = _recipeResultsListViewController.SelectedRecipeResult;
       }
 
-
       private void FillItemsListBox( string filter )
       {
          itemsListBox.Items.Clear();
@@ -97,8 +98,32 @@ namespace RePopCraftingStudio
          mainSplitContainer.SplitterDistance = Properties.Settings.Default.MainSplitterDistance;
          leftSplitContainer.SplitterDistance = Properties.Settings.Default.LeftSplitterDistance;
          gameViewSplitContainer.SplitterDistance = Properties.Settings.Default.GameViewSplitterDistance;
-         itemFilterTextBox.Text = Properties.Settings.Default.LastItemFilter;
          theTabControl.SelectedIndex = Properties.Settings.Default.LastTabIndex;
+         _db.ConnectionString = Properties.Settings.Default.ConnectionString;
+
+         try
+         {
+            // test db connection
+            _db.GetItemName(1);
+         }
+         catch (Exception ex)
+         {
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+               Title = @"Select The Repopulation database file.",
+               Multiselect = false,
+               CheckFileExists = true,
+               FileName = @"repopdata.db3",
+               //Filter = @"repopdata.db3",
+            };
+            if ( DialogResult.OK == dialog.ShowDialog( this ) )
+            {
+               _db.ConnectionString = string.Format( "Data Source=\"{0}\"", dialog.FileName );
+            }
+         }
+
+         // NOTE: set this after user has chance to verify DB connection string
+         itemFilterTextBox.Text = Properties.Settings.Default.LastItemFilter;
       }
 
       private void SaveSettings()
@@ -110,6 +135,7 @@ namespace RePopCraftingStudio
          Properties.Settings.Default.GameViewSplitterDistance = gameViewSplitContainer.SplitterDistance;
          Properties.Settings.Default.LastItemFilter = itemFilterTextBox.Text;
          Properties.Settings.Default.LastTabIndex = theTabControl.SelectedIndex;
+         Properties.Settings.Default.ConnectionString = _db.ConnectionString;
 
          Properties.Settings.Default.Save();
       }
