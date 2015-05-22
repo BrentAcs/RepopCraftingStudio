@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
-using RePopCrafting;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace RePopCraftingStudio.Db
 {
@@ -182,10 +183,28 @@ namespace RePopCraftingStudio.Db
 
 
          var agents = SelectRecipeAgentsForRecipe( recipeResult.RecipeId );
+      }
+
+      public void SchemaTest()
+      {
+         List<string> rawTables = new List<string>();
+         var rows = GetDataRows( @"SELECT tbl_name FROM sqlite_master" );
+         foreach ( DataRow row in rows )
+         {
+            rawTables.Add( (string)row.ItemArray[ 0 ] );
+         }
+         IEnumerable<string> tables = rawTables.OrderBy( t => t ).Distinct();
+
+         XDocument doc = new XDocument( new[] { new XElement( @"Schema" ) } );
+         foreach ( string table in tables )
+         {
+            doc.Add( new XElement( table ) );
+         }
 
 
-
-
+         string xml = doc.ToString();
+         //DataTable table = GetDataTable(@"select * from items");
+         //string test = table.Columns[0].ColumnName;
       }
    }
 

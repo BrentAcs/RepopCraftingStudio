@@ -27,6 +27,8 @@ namespace RePopCraftingStudio
          _recipeResultsListViewController = new RecipeResultsListViewController( _db, recipeResultsListView );
 
          LoadSettings();
+
+         _db.SchemaTest();
       }
 
       private void Form1_FormClosing( object sender, FormClosingEventArgs e )

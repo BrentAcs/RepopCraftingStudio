@@ -1,0 +1,68 @@
+Crafting_Components
+   componentId
+   displayName
+   displayDescription
+   icondId
+   
+Crafting_Filters
+   filterId
+   displayName
+   displayDescription
+   
+Fittings
+   FittingId
+   displayName
+   displayDescription
+
+Items
+   itemId
+   displayName
+   displayDescription
+   icondId
+
+   
+
+Item_Crafting_Components
+   itemId
+   compoonentId
+      
+Item_Crafting_Filters
+   itemId
+   filterId
+   
+Recipe_Agents
+   recipeId
+   componentId
+   count
+   weight
+   
+Recipe_Ingredients
+   recipeId
+   componentId
+   count
+   weight
+   ingSlot
+   
+Recipe_Results
+   recipeId
+   groupId
+   count
+   grade
+   level
+   type
+   resultsId
+   filter1Id
+   filter2Id
+   filter3Id
+   filter4Id
+   
+Recipes
+   recipedId
+   displayName
+   displayDescription
+   skillId
+   steps
+   ingredientWeight
+   agentWeight
+   
+   
