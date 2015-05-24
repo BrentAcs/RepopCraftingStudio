@@ -69,6 +69,25 @@ namespace RePopCraftingStudio.Db
       }
    }
 
+   [DebuggerDisplay( @"{ComponentId}: {Name}" )]
+   public class CraftingComponent : Entity
+   {
+      public CraftingComponent( RepopDb db, object[] items )
+         : base( db, items )
+      {
+      }
+
+      public long ComponentId { get { return (long)Items[ 0 ]; } }
+      public string Name { get { return (string)Items[ 1 ]; } }
+      public string Description { get { return (string)Items[ 2 ]; } }
+      public long IconId { get { return (long)Items[ 3 ]; } }
+
+      public override string ToString()
+      {
+         return Name;
+      }
+   }
+
    public class Recipe : Entity
    {
       public Recipe( RepopDb db, object[] items )

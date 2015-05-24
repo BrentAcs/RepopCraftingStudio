@@ -69,6 +69,26 @@ namespace RePopCraftingStudio.Db
          return (string)GetDataRow( @"select displayName from skills where skillId = {0}", skillId ).ItemArray[ 0 ];
       }
 
+      public Item SelectItemById( long itemId )
+      {
+         return new Item( this, GetDataRow( @"select * from items where itemId = {0}", itemId ).ItemArray );
+      }
+
+      public IEnumerable<Item> SelectItemsByIds( IEnumerable<long> itemsIds )
+      {
+         IList<Item> items = new List<Item>();
+         foreach ( long id in itemsIds )
+         {
+            items.Add( SelectItemById( id ) );
+         }
+         return items;
+      }
+
+      public CraftingComponent SelectCraftingComponentById( long componentId )
+      {
+         return new CraftingComponent( this, GetDataRow( @"select * from crafting_components where componentId = {0}", componentId ).ItemArray );
+      }
+
       public IEnumerable<Item> SelectItemsByName( string filter )
       {
          return RowsToEntities(
@@ -208,7 +228,6 @@ namespace RePopCraftingStudio.Db
 
          foreach ( DataRow row in rows )
          {
-
             list.Add( make( row ) );
          }
          return list;
@@ -255,7 +274,7 @@ namespace RePopCraftingStudio.Db
          }
       }
 
-      public void BuildManifest( long itemId )
+      public ItemManifest BuildManifest( long itemId )
       {
          LogInfo( @"Building manifest for item id: {0}.", itemId );
 
@@ -302,6 +321,36 @@ namespace RePopCraftingStudio.Db
          {
             agents.Add( new ManifestLineItem( this, compId, SelectItemIdsForCraftingComponentId( compId ) ) );
          }
+
+
+         // Build up item manifest
+
+         IList<ItemManifest.Entry> ingredientEntries = new List<ItemManifest.Entry>();
+         foreach ( ManifestLineItem item in ingredients )
+         {
+            ingredientEntries.Add( new ItemManifest.Entry(
+               SelectCraftingComponentById( item.ComponentId ),
+               SelectItemsByIds( item.ItemIds )
+               ) );
+         }
+
+         IList<ItemManifest.Entry> agentEntries = new List<ItemManifest.Entry>();
+         foreach ( ManifestLineItem item in agents )
+         {
+            agentEntries.Add( new ItemManifest.Entry(
+               SelectCraftingComponentById( item.ComponentId ),
+               SelectItemsByIds( item.ItemIds )
+               ) );
+         }
+
+         ItemManifest itemManifest = new ItemManifest
+         {
+            Item = SelectItemById( itemId ),
+            Ingredients = ingredientEntries,
+            Agents = agentEntries,
+         };
+
+         return itemManifest;
       }
 
       private void LogInfo( string format, params object[] args )
@@ -335,48 +384,70 @@ namespace RePopCraftingStudio.Db
 
       //   string xml = doc.ToString();
       //}
-   }
 
-   public class ManifestLineItem
-   {
-      protected RepopDb Db { get; private set; }
-      private readonly IEnumerable<long> _itemIds;
-      private IList<string> _itemNames;
-
-      public ManifestLineItem( RepopDb db, long componentId, long itemId )
-         : this( db, componentId, new[] { itemId } )
+      internal class ManifestLineItem
       {
+         protected RepopDb Db { get; private set; }
+         private readonly IEnumerable<long> _itemIds;
+         private IList<string> _itemNames;
 
-      }
-
-      public ManifestLineItem( RepopDb db, long componentId, IEnumerable<long> itemIds )
-      {
-         Db = db;
-         ComponentId = componentId;
-         _itemIds = itemIds;
-         GetItemNames();
-      }
-
-      public bool IsSpecific { get { return 1 == _itemIds.Count(); } }
-
-      public long ComponentId { get; set; }
-      public string ComponentName { get { return Db.GetComponentName( ComponentId ); } }
-
-      public long ItemId
-      {
-         get { return 1 == _itemIds.Count() ? _itemIds.First() : 0; }
-      }
-
-      public IEnumerable<long> ItemIds { get { return _itemIds; } }
-      public IEnumerable<string> ItemNames { get { return _itemNames; } }
-
-      private void GetItemNames()
-      {
-         _itemNames = new List<string>();
-         foreach ( long itemId in ItemIds )
+         public ManifestLineItem( RepopDb db, long componentId, long itemId )
+            : this( db, componentId, new[] { itemId } )
          {
-            _itemNames.Add( Db.GetItemName( itemId ) );
+
+         }
+
+         public ManifestLineItem( RepopDb db, long componentId, IEnumerable<long> itemIds )
+         {
+            Db = db;
+            ComponentId = componentId;
+            _itemIds = itemIds;
+            GetItemNames();
+         }
+
+         public bool IsSpecific { get { return 1 == _itemIds.Count(); } }
+
+         public long ComponentId { get; set; }
+         public string ComponentName { get { return Db.GetComponentName( ComponentId ); } }
+
+         public long ItemId
+         {
+            get { return 1 == _itemIds.Count() ? _itemIds.First() : 0; }
+         }
+
+         public IEnumerable<long> ItemIds { get { return _itemIds; } }
+         public IEnumerable<string> ItemNames { get { return _itemNames; } }
+
+         private void GetItemNames()
+         {
+            _itemNames = new List<string>();
+            foreach ( long itemId in ItemIds )
+            {
+               _itemNames.Add( Db.GetItemName( itemId ) );
+            }
          }
       }
+   }
+
+   public class ItemManifest
+   {
+      [DebuggerDisplay(@"{Component}")]
+      public class Entry
+      {
+         public CraftingComponent Component { get; private set; }
+         public IEnumerable<Item> Items { get; private set; }
+         public bool IsSpecific { get { return 1 == Items.Count(); } }
+         public Item SpecificItem { get { return Items.FirstOrDefault(); } }
+
+         public Entry( CraftingComponent component, IEnumerable<Item> items )
+         {
+            Component = component;
+            Items = items;
+         }
+      }
+
+      public Item Item { get; set; }
+      public IEnumerable<Entry> Ingredients { get; set; }
+      public IEnumerable<Entry> Agents { get; set; }
    }
 }

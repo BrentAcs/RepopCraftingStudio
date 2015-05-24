@@ -29,8 +29,9 @@ namespace RePopCraftingStudio
          LoadSettings();
 
          //_db.SchemaTest();
-         _db.BuildManifest( 290 );  // distilled water
-         _db.BuildManifest( 974 );  // sulfuric acid
+         //ItemManifest distWater = _db.BuildManifest( 290 );  // distilled water
+         //ItemManifest sulfAcid = _db.BuildManifest( 974 );  // sulfuric acid
+         ItemManifest getSetlang = _db.BuildManifest( 442 ); // genetically engineered setlang
       }
 
       private void Form1_FormClosing( object sender, FormClosingEventArgs e )
@@ -108,9 +109,9 @@ namespace RePopCraftingStudio
          try
          {
             // test db connection
-            _db.GetItemName(1);
+            _db.GetItemName( 1 );
          }
-         catch (Exception ex)
+         catch ( Exception ex )
          {
             OpenFileDialog dialog = new OpenFileDialog
             {
