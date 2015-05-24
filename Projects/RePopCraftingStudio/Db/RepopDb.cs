@@ -10,6 +10,7 @@ namespace RePopCraftingStudio.Db
 {
    // Jim's request for credit:
    // I want to be referenced as "The dude that was once too stoned to make Mac & CHeese"
+   // Misugumi, Towan Navarr, Treyonna Sullivan
 
    public class RepopDb
    {
@@ -18,7 +19,8 @@ namespace RePopCraftingStudio.Db
 
       public RepopDb()
          : this( string.Empty )
-      { }
+      {
+      }
 
       public RepopDb( string connectionString )
       {
@@ -27,19 +29,30 @@ namespace RePopCraftingStudio.Db
 
       public string GetComponentName( EntityWithComponentId entity )
       {
-         return (string)GetDataRow( @"select displayName from crafting_components where componentId = {0}", entity.ComponentId ).ItemArray[ 0 ];
+         return GetComponentName( entity.ComponentId );
+      }
+
+      public string GetComponentName( long componentId )
+      {
+         return
+            (string)
+            GetDataRow( @"select displayName from crafting_components where componentId = {0}", componentId )
+               .ItemArray[ 0 ];
       }
 
       public string GetRecipeName( RecipeResult recipeResult )
       {
-         return (string)GetDataRow( @"select displayName from recipes where recipeId = {0}", recipeResult.RecipeId ).ItemArray[ 0 ];
+         return
+            (string)
+            GetDataRow( @"select displayName from recipes where recipeId = {0}", recipeResult.RecipeId ).ItemArray[ 0 ];
       }
 
       public string GetCraftingFilterName( long filterId )
       {
          if ( 0 == filterId )
             return string.Empty;
-         return (string)GetDataRow( @"select displayName from crafting_filters where filterId = {0}", filterId ).ItemArray[ 0 ];
+         return
+            (string)GetDataRow( @"select displayName from crafting_filters where filterId = {0}", filterId ).ItemArray[ 0 ];
       }
 
       public string GetItemName( long itemId )
@@ -76,11 +89,6 @@ namespace RePopCraftingStudio.Db
                itemId ),
             r => new Recipe( this, r.ItemArray ) );
       }
-
-      //public bool IsItemCraftComponentUnique( long componentId )
-      //{
-      //   return 1 == GetDataRows( @"select itemId from item_crafting_components where componentId = {0}", componentId ).Count;
-      //}
 
       public IEnumerable<RecipeAgent> SelectRecipeAgentsForRecipe( Recipe recipe )
       {
@@ -129,21 +137,67 @@ namespace RePopCraftingStudio.Db
             r => new RecipeResult( this, r.ItemArray ) );
       }
 
-      public long[] SelectComponentIdsForRecipe( long recipeId )
+      public long[] SelectComponentIdsForRecipeIngredients( long recipeId )
       {
          // TODO: Jim, can this be reduced?
          IList<long> componentIds = new List<long>();
 
          for ( int slot = 1; slot <= 4; slot++ )
          {
-            long compId = (long)GetDataRow( @"select componentId from recipe_ingredients where recipeId={0} and ingSlot={1}", recipeId, slot ).ItemArray[ 0 ];
-            if ( 0 == compId )
+            var rows = GetDataRows( @"select componentId from recipe_ingredients where recipeId={0} and ingSlot={1}",
+                                   recipeId, slot );
+            if ( 0 == rows.Count )
                break;
 
-            componentIds.Add( compId );
+            componentIds.Add( (long)rows[ 0 ].ItemArray[ 0 ] );
          }
 
          return componentIds.ToArray();
+      }
+
+      public long SelectItemIdForCraftingComponentId( long componentId )
+      {
+         return (long)GetDataRow( @"select itemId from item_crafting_components where componentId = {0}", componentId ).ItemArray[ 0 ];
+      }
+
+      public IEnumerable<long> SelectItemIdsForCraftingComponentId( long componentId )
+      {
+         IList<long> itemIds = new List<long>();
+         var rows = GetDataRows( @"select itemId from item_crafting_components where componentId={0} ", componentId );
+         foreach ( DataRow row in rows )
+         {
+            itemIds.Add( (long)row.ItemArray[ 0 ] );
+         }
+
+         return itemIds;
+      }
+
+      public IEnumerable<long> SelectItemIdsForCraftingComponentId( long componentId, long filterId )
+      {
+         IList<long> itemIds = new List<long>();
+         var rows = GetDataRows(
+            "select * from item_crafting_filters " +
+            "inner join item_crafting_components ON (item_crafting_components.itemId = item_crafting_filters.itemId) " +
+            "where item_crafting_components.componentId = {0} and item_crafting_filters.filterId ={1}",
+            componentId, filterId );
+         foreach ( DataRow row in rows )
+         {
+            itemIds.Add( (long)row.ItemArray[ 0 ] );
+         }
+
+         return itemIds;
+      }
+
+      public IEnumerable<long> SelectComponentIdsForRecipeAgents( long recipeId )
+      {
+         IList<long> componentIds = new List<long>();
+         var rows = GetDataRows( @"select componentId from recipe_agents where recipeId={0} ", recipeId );
+         foreach ( DataRow row in rows )
+         {
+            componentIds.Add( (long)row.ItemArray[ 0 ] );
+         }
+
+         return componentIds;
       }
 
       // =============================================================================================
@@ -191,10 +245,9 @@ namespace RePopCraftingStudio.Db
                   command.CommandText = sql;
                   SQLiteDataReader reader = command.ExecuteReader();
                   table.Load( reader );
+                  return table;
                }
             }
-
-            return table;
          }
          catch ( Exception ex )
          {
@@ -204,15 +257,56 @@ namespace RePopCraftingStudio.Db
 
       public void BuildManifest( long itemId )
       {
+         LogInfo( @"Building manifest for item id: {0}.", itemId );
+
+         IList<ManifestLineItem> ingredients = new List<ManifestLineItem>();
+         IList<ManifestLineItem> agents = new List<ManifestLineItem>();
+
          // Get recipe results where resultId = itemId && groupId = 1
          IEnumerable<RecipeResult> recipeResults = SelectRecipeResultsForItem( itemId, 1 );
+         LogInfo( @"Selected {0} recipe results.", recipeResults.Count() );
 
          // NOTE: will need to address multipe results next, for now use first recipe result
          RecipeResult recipeResult = recipeResults.First();
 
          // Get each ingredient entry component Id
-         long[] componentIds = SelectComponentIdsForRecipe( recipeResult.RecipeId );
+         long[] componentIds = SelectComponentIdsForRecipeIngredients( recipeResult.RecipeId );
+         LogInfo( @"Selected {0} ingredient component ids for recipe id: {1}.", componentIds.Count(), recipeResult.RecipeId );
+         for ( int ingSlot = 1; ingSlot <= 4; ingSlot++ )
+         {
+            if ( componentIds.Length == ingSlot - 1 )
+               break;
 
+            long filterId = recipeResult.GetFilterId( ingSlot );
+            long componentId = componentIds[ ingSlot - 1 ];
+
+            if ( 0 == filterId )
+            {
+               long ingItemId = SelectItemIdForCraftingComponentId( componentId );
+               LogInfo( @"Selected item id: {0} for compontent Id: {1}", ingItemId, componentId );
+               ingredients.Add( new ManifestLineItem( this, componentId, ingItemId ) );
+            }
+            else
+            {
+               IEnumerable<long> ingItemIds = SelectItemIdsForCraftingComponentId( componentId, filterId );
+               LogInfo( @"Selected item ids: {0} for compontent Id: {1}", ingItemIds.ToArray(), componentId );
+               ingredients.Add( new ManifestLineItem( this, componentId, ingItemIds.ToArray() ) );
+            }
+         }
+
+         // get each agent entry component Id
+         // NOTE:  Brent, make attempt to write JOIN'd SQL for this in the morning.
+         IEnumerable<long> compIds = SelectComponentIdsForRecipeAgents( recipeResult.RecipeId );
+         LogInfo( @"Selected {0} agent component ids for recipe id: {1}.", compIds.Count(), recipeResult.RecipeId );
+         foreach ( long compId in compIds )
+         {
+            agents.Add( new ManifestLineItem( this, compId, SelectItemIdsForCraftingComponentId( compId ) ) );
+         }
+      }
+
+      private void LogInfo( string format, params object[] args )
+      {
+         Debug.WriteLine( string.Format( format, args ) );
       }
 
       //public void SchemaTest()
@@ -243,23 +337,46 @@ namespace RePopCraftingStudio.Db
       //}
    }
 
-
-
    public class ManifestLineItem
    {
+      protected RepopDb Db { get; private set; }
       private readonly IEnumerable<long> _itemIds;
+      private IList<string> _itemNames;
 
-      public ManifestLineItem( long componentId, IEnumerable<long> itemIds )
+      public ManifestLineItem( RepopDb db, long componentId, long itemId )
+         : this( db, componentId, new[] { itemId } )
       {
-         ComponentId = componentId;
-         _itemIds = itemIds;
+
       }
 
+      public ManifestLineItem( RepopDb db, long componentId, IEnumerable<long> itemIds )
+      {
+         Db = db;
+         ComponentId = componentId;
+         _itemIds = itemIds;
+         GetItemNames();
+      }
+
+      public bool IsSpecific { get { return 1 == _itemIds.Count(); } }
+
       public long ComponentId { get; set; }
+      public string ComponentName { get { return Db.GetComponentName( ComponentId ); } }
+
       public long ItemId
       {
          get { return 1 == _itemIds.Count() ? _itemIds.First() : 0; }
       }
+
       public IEnumerable<long> ItemIds { get { return _itemIds; } }
+      public IEnumerable<string> ItemNames { get { return _itemNames; } }
+
+      private void GetItemNames()
+      {
+         _itemNames = new List<string>();
+         foreach ( long itemId in ItemIds )
+         {
+            _itemNames.Add( Db.GetItemName( itemId ) );
+         }
+      }
    }
 }

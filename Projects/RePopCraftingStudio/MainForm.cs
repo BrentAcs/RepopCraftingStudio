@@ -29,7 +29,8 @@ namespace RePopCraftingStudio
          LoadSettings();
 
          //_db.SchemaTest();
-         _db.BuildManifest( 290 );
+         _db.BuildManifest( 290 );  // distilled water
+         _db.BuildManifest( 974 );  // sulfuric acid
       }
 
       private void Form1_FormClosing( object sender, FormClosingEventArgs e )
