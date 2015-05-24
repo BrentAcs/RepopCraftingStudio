@@ -1,0 +1,251 @@
+<Schema>
+  <!-- Non-Crafting -->
+  <Abilities>
+    <abilityID />
+    <displayName />
+    <displayDescription />
+    <iconID />
+    <skillID />
+    <skillMin />
+    <recharge />
+    <globalCoolDown />
+    <visualizationTimer />
+    <enduranceCost />
+    <energyCost />
+    <momentumCost />
+    <abilType />
+  </Abilities>
+  <Abilities_ActivationData>
+    <abilityID />
+    <activationType />
+    <radius />
+    <range />
+  </Abilities_ActivationData>
+  <Abilities_WeaponData>
+    <abilityID />
+    <weaponAccuracyMod />
+    <weaponDamageMod />
+    <weaponEnduranceMod />
+    <weaponEnergyMod />
+    <weaponGlobalCooldownMod />
+    <weaponMomentumMod />
+    <weaponRangeMod />
+    <weaponSpeedMod />
+  </Abilities_WeaponData>
+  <Areas>
+    <areaID />
+    <areaName />
+    <regionLocation />
+  </Areas>
+  <Hacking>
+    <hackingID />
+    <title />
+    <recipe />
+    <skill />
+  </Hacking>
+  <Harvestable_Regions>
+    <harvestableRegionID />
+    <areaID />
+    <levelMin />
+    <levelMax />
+    <minCount />
+    <maxCount />
+    <propID />
+    <replenishRate />
+    <isSeasonal />
+  </Harvestable_Regions>
+  <Harvestable_Regions_Multi>
+    <harvestableRegionID />
+    <propID />
+  </Harvestable_Regions_Multi>
+  <Item_Armor>
+    <itemID />
+    <armorType />
+    <armorReduction />
+    <equipLOCation />
+  </Item_Armor>
+  <Item_Armor_Energy>
+    <itemID />
+    <maxEnergy />
+    <poolSplit />
+    <rechargeRate />
+    <rechargeDelay />
+  </Item_Armor_Energy>
+  <Item_Attributes>
+    <attributeID />
+    <itemID />
+    <value />
+  </Item_Attributes>
+  <Item_Stackable>
+    <itemID />
+    <defaultStackSize />
+    <maxStackSize />
+  </Item_Stackable>
+  <Item_Value>
+    <itemID />
+    <value />
+    <currencyType />
+  </Item_Value>
+  <Item_Weapons>
+    <itemID />
+    <momentum />
+    <endurance />
+    <armorLightPenetration />
+    <armorMediumPenetration />
+    <armorHeavyPenetration />
+    <minimalAmount />
+    <minimalRange />
+    <attackRange />
+    <diminishedAmount />
+    <diminishedRange />
+    <maximumRange />
+    <damageType />
+    <damageAmount />
+    <energyCost />
+    <attackSpeed />
+    <weaponCategory />
+    <dualWield />
+  </Item_Weapons>
+  <Item_Attributes_Agents>
+    <attributeID />
+    <itemID />
+    <value />
+  </Item_Attributes_Agents>
+  <Props>
+    <propID />
+    <subsistenceID />
+    <numHarvests />
+    <toolID />
+    <skillID />
+  </Props>
+  <Skills>
+    <skillID />
+    <displayName />
+    <displayDescription />
+  </Skills>
+  <Species>
+    <speciesID />
+    <displayName />
+    <displayDescription />
+    <extractionType />
+  </Species>
+  <ResourceAttributes>
+    <resourceAttributeID />
+    <displayName />
+    <shortName />
+  </ResourceAttributes>
+  <Species_Results>
+    <speciesID />
+    <groupID />
+    <chance />
+    <chanceMultiplier />
+    <itemID />
+    <count />
+    <type />
+    <grade />
+    <difficulty />
+  </Species_Results>
+  <Structures>
+    <structureID />
+    <displayName />
+    <isHousingStructure />
+  </Structures>
+  <Tips>
+    <tipID />
+    <title />
+    <displayDescription />
+  </Tips>
+  
+  <!-- Lookups -->
+
+  <Crafting_Components>
+    <componentID />
+    <displayName />
+    <displayDescription />
+    <iconID />
+  </Crafting_Components>
+
+  <Crafting_Filters>
+    <filterID />
+    <displayName />
+    <displayDescription />
+  </Crafting_Filters>
+
+  <Fittings>
+    <fittingID />
+    <displayName />
+    <displayDescription />
+  </Fittings>
+
+  <Items>
+    <itemID />
+    <displayName />
+    <displayDescription />
+    <iconID />
+  </Items>
+  
+  <!-- X-Reference -->
+  
+  <Item_Crafting_Components>
+    <itemID />
+    <componentID />
+  </Item_Crafting_Components>
+
+  <Item_Crafting_Filters>
+    <itemID />
+    <filterID />
+  </Item_Crafting_Filters>
+  
+  <Recipe_Agents>
+    <recipeID />
+    <componentID />
+    <count />
+    <weight />
+  </Recipe_Agents>
+
+  <Recipe_Ingredients>
+    <recipeID />
+    <componentID />
+    <count />
+    <weight />
+    <ingSlot />
+  </Recipe_Ingredients>
+
+  <Recipe_Results>
+    <recipeID />
+    <groupID />
+    <count />
+    <grade />
+    <level />
+    <type />
+    <resultID />
+    <filter1ID />
+    <filter2ID />
+    <filter3ID />
+    <filter4ID />
+  </Recipe_Results>
+
+  <Recipes>
+    <recipeID />
+    <displayName />
+    <displayDescription />
+    <skillID />
+    <steps />
+    <ingredientWeight />
+    <agentWeight />
+  </Recipes>
+
+  <Recipe_Skill_Range>
+    <recipeID />
+    <level />
+    <minf />
+    <mind />
+    <minc />
+    <minb />
+    <mina />
+    <minaa />
+    <over1 />
+    <over2 />
+  </Recipe_Skill_Range>
+  
+</Schema>

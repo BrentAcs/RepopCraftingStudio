@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using RePopCrafting;
 
@@ -171,5 +172,13 @@ namespace RePopCraftingStudio.Db
 
       [EntityColumn( @"Filter 4 Name", 96 )]
       public string Filter4Name { get { return Db.GetCraftingFilterName( Filter4Id ); } }
+
+      public long GetFilterId(int index)
+      {
+         if( index < 0 || index > 3)
+            throw new ArgumentOutOfRangeException(@"index in GetFilterId is out of range.");
+
+         return (long) Items[6 + index];
+      }
    }
 }

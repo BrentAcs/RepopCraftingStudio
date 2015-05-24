@@ -1,0 +1,43 @@
+Get the list of Ingredients/Agents for an Item.
+
+Steps:
+
+1. 	Select ItemId from tblItems (""Genetically Engineered Setlang")
+2. 	Select recipe_result where resultId == itemId and groupId == "1"
+2a.	loop for each result, can be more than one (example uses first)
+3.	for each filter (1-4); Select componentIds from recipe_ingredients where recipeId matches and ingSlot == filter #
+4.	for each filter (1-4); Select the unique item
+
+
+
+SQL:
+1. 	select * from items where displayname like 'Genetically Engineered Setlang'
+2. 	select * from recipe_results where resultId = 442 and GroupId = 1
+3.	select componentId from recipe_ingredients where recipeId=481 and ingSlot=1
+	select componentId from recipe_ingredients where recipeId=481 and ingSlot=2
+	select componentId from recipe_ingredients where recipeId=481 and ingSlot=3
+	select componentId from recipe_ingredients where recipeId=481 and ingSlot=4
+4.	select * from item_crafting_filters
+	inner join item_crafting_components ON (item_crafting_components.itemId = item_crafting_filters.itemId)
+	where item_crafting_components.componentId = 59 and item_crafting_filters.filterId = 15
+	select * from item_crafting_filters
+	inner join item_crafting_components ON (item_crafting_components.itemId = item_crafting_filters.itemId)
+	where item_crafting_components.componentId = 490 and item_crafting_filters.filterId = 22
+
+	
+	
+Results:
+1. 	itemId = 442
+2. 	recipeId = 481, filter1Id = 15, filter2Id = 22, filter3Id = 0, filter4Id = 0, 
+	recipeId = 481, filter1Id = 15, filter2Id = 18, filter3Id = 0, filter4Id = 0, 
+	recipeId = 481, filter1Id = 15, filter2Id = 17, filter3Id = 0, filter4Id = 0, 
+	recipeId = 481, filter1Id = 15, filter2Id = 59, filter3Id = 0, filter4Id = 0, 
+3. 	componentId = 59
+	componentId = 490
+	(no rows selected)
+	(no rows selected)
+4.	itemId = 402
+	itemId = 435
+	(no rows selected)
+	(no rows selected)
+

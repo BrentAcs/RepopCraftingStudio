@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 
 namespace RePopCraftingStudio.Db
 {
+   // Jim's request for credit:
+   // I want to be referenced as "The dude that was once too stoned to make Mac & CHeese"
+
    public class RepopDb
    {
       //private string _connStr = string.Empty;
@@ -144,23 +148,34 @@ namespace RePopCraftingStudio.Db
 
       private DataTable GetDataTable( string format, params object[] args )
       {
-         if ( string.IsNullOrEmpty( ConnectionString ) )
-            throw new InvalidOperationException( @"Connection string is null or empty." );
+         string sql = string.Empty;
 
-         DataTable table = new DataTable();
-
-         using ( SQLiteConnection connection = new SQLiteConnection( ConnectionString ) )
+         try
          {
-            connection.Open();
-            using ( SQLiteCommand command = new SQLiteCommand( connection ) )
-            {
-               command.CommandText = string.Format( format, args );
-               SQLiteDataReader reader = command.ExecuteReader();
-               table.Load( reader );
-            }
-         }
+            sql = string.Format( format, args );
+            Debug.WriteLine( sql );
+            if ( string.IsNullOrEmpty( ConnectionString ) )
+               throw new InvalidOperationException( @"Connection string is null or empty." );
 
-         return table;
+            DataTable table = new DataTable();
+
+            using ( SQLiteConnection connection = new SQLiteConnection( ConnectionString ) )
+            {
+               connection.Open();
+               using ( SQLiteCommand command = new SQLiteCommand( connection ) )
+               {
+                  command.CommandText = sql;
+                  SQLiteDataReader reader = command.ExecuteReader();
+                  table.Load( reader );
+               }
+            }
+
+            return table;
+         }
+         catch ( Exception ex )
+         {
+            throw new InvalidOperationException( string.Format( "Error executing SQL statement.\nSQL:\n\n{0}", sql ), ex );
+         }
       }
 
       public void BuildManifest( long itemId )
@@ -185,27 +200,32 @@ namespace RePopCraftingStudio.Db
          var agents = SelectRecipeAgentsForRecipe( recipeResult.RecipeId );
       }
 
-      public void SchemaTest()
-      {
-         List<string> rawTables = new List<string>();
-         var rows = GetDataRows( @"SELECT tbl_name FROM sqlite_master" );
-         foreach ( DataRow row in rows )
-         {
-            rawTables.Add( (string)row.ItemArray[ 0 ] );
-         }
-         IEnumerable<string> tables = rawTables.OrderBy( t => t ).Distinct();
+      //public void SchemaTest()
+      //{
+      //   List<string> rawTables = new List<string>();
+      //   var rows = GetDataRows( @"SELECT tbl_name FROM sqlite_master" );
+      //   foreach ( DataRow row in rows )
+      //   {
+      //      rawTables.Add( (string)row.ItemArray[ 0 ] );
+      //   }
+      //   IEnumerable<string> tables = rawTables.OrderBy( t => t ).Distinct();
 
-         XDocument doc = new XDocument( new[] { new XElement( @"Schema" ) } );
-         foreach ( string table in tables )
-         {
-            doc.Add( new XElement( table ) );
-         }
+      //   XDocument doc = new XDocument( new XElement( @"Schema" ) );
+      //   foreach ( string tableName in tables )
+      //   {
+      //      XElement ele = new XElement( tableName );
+      //      DataTable table = GetDataTable( @"select * from {0}", tableName );
+      //      foreach ( DataColumn column in table.Columns )
+      //      {
+      //         ele.Add( new XElement( column.ColumnName ) );
+      //      }
+      //      //string test = table.Columns[0].ColumnName;
 
+      //      doc.Root.Add( ele );
+      //   }
 
-         string xml = doc.ToString();
-         //DataTable table = GetDataTable(@"select * from items");
-         //string test = table.Columns[0].ColumnName;
-      }
+      //   string xml = doc.ToString();
+      //}
    }
 
    //public class ManifestItem
