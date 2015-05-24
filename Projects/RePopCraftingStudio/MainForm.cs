@@ -29,6 +29,7 @@ namespace RePopCraftingStudio
          LoadSettings();
 
          //_db.SchemaTest();
+         _db.BuildManifest( 290 );
       }
 
       private void Form1_FormClosing( object sender, FormClosingEventArgs e )

@@ -121,6 +121,30 @@ namespace RePopCraftingStudio.Db
             r => new RecipeResult( this, r.ItemArray ) );
       }
 
+      public IEnumerable<RecipeResult> SelectRecipeResultsForItem( long recipeId, long groupId )
+      {
+         return RowsToEntities(
+            GetDataRows(
+               @"select * from recipe_results where resultId = {0} and groupId = {1}", recipeId, groupId ),
+            r => new RecipeResult( this, r.ItemArray ) );
+      }
+
+      public long[] SelectComponentIdsForRecipe( long recipeId )
+      {
+         // TODO: Jim, can this be reduced?
+         IList<long> componentIds = new List<long>();
+
+         for ( int slot = 1; slot <= 4; slot++ )
+         {
+            long compId = (long)GetDataRow( @"select componentId from recipe_ingredients where recipeId={0} and ingSlot={1}", recipeId, slot ).ItemArray[ 0 ];
+            if ( 0 == compId )
+               break;
+
+            componentIds.Add( compId );
+         }
+
+         return componentIds.ToArray();
+      }
 
       // =============================================================================================
 
@@ -180,24 +204,15 @@ namespace RePopCraftingStudio.Db
 
       public void BuildManifest( long itemId )
       {
-         RecipeResult recipeResult = new RecipeResult( this, GetDataRow( @"select * from recipe_results where resultId = {0} and groupId = 1", itemId ).ItemArray );
+         // Get recipe results where resultId = itemId && groupId = 1
+         IEnumerable<RecipeResult> recipeResults = SelectRecipeResultsForItem( itemId, 1 );
 
+         // NOTE: will need to address multipe results next, for now use first recipe result
+         RecipeResult recipeResult = recipeResults.First();
 
-         var ingredients = SelectRecipeIngredientsForRecipe( recipeResult.RecipeId );
-         foreach ( RecipeIngredient ingredient in ingredients )
-         {
-            //if ( ingredient.Unique )
-            //{
-            //   Debug.WriteLine( @"unique." );
-            //}
-            //else
-            //{
-            //   Debug.WriteLine( @"not unique." );
-            //}
-         }
+         // Get each ingredient entry component Id
+         long[] componentIds = SelectComponentIdsForRecipe( recipeResult.RecipeId );
 
-
-         var agents = SelectRecipeAgentsForRecipe( recipeResult.RecipeId );
       }
 
       //public void SchemaTest()
@@ -228,5 +243,23 @@ namespace RePopCraftingStudio.Db
       //}
    }
 
-   //public class ManifestItem
+
+
+   public class ManifestLineItem
+   {
+      private readonly IEnumerable<long> _itemIds;
+
+      public ManifestLineItem( long componentId, IEnumerable<long> itemIds )
+      {
+         ComponentId = componentId;
+         _itemIds = itemIds;
+      }
+
+      public long ComponentId { get; set; }
+      public long ItemId
+      {
+         get { return 1 == _itemIds.Count() ? _itemIds.First() : 0; }
+      }
+      public IEnumerable<long> ItemIds { get { return _itemIds; } }
+   }
 }
