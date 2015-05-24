@@ -40,8 +40,11 @@ namespace RePopCraftingStudio
          this.gameViewTabPage = new System.Windows.Forms.TabPage();
          this.gameViewSplitContainer = new System.Windows.Forms.SplitContainer();
          this.recipeTreeView = new System.Windows.Forms.TreeView();
+         this.manifestTabPage = new System.Windows.Forms.TabPage();
+         this.manifestViewSplitContainer = new System.Windows.Forms.SplitContainer();
+         this.manifestTreeView = new System.Windows.Forms.TreeView();
          this.recipeResultsListView = new RePopCraftingStudio.UserControls.EntityListView();
-         this.tabPage2 = new System.Windows.Forms.TabPage();
+         this.manifestTextBox = new System.Windows.Forms.TextBox();
          this.mainSplitContainer.Panel1.SuspendLayout();
          this.mainSplitContainer.Panel2.SuspendLayout();
          this.mainSplitContainer.SuspendLayout();
@@ -53,6 +56,10 @@ namespace RePopCraftingStudio
          this.gameViewSplitContainer.Panel1.SuspendLayout();
          this.gameViewSplitContainer.Panel2.SuspendLayout();
          this.gameViewSplitContainer.SuspendLayout();
+         this.manifestTabPage.SuspendLayout();
+         this.manifestViewSplitContainer.Panel1.SuspendLayout();
+         this.manifestViewSplitContainer.Panel2.SuspendLayout();
+         this.manifestViewSplitContainer.SuspendLayout();
          this.SuspendLayout();
          // 
          // itemFilterTextBox
@@ -136,7 +143,7 @@ namespace RePopCraftingStudio
          // 
          this.theTabControl.Alignment = System.Windows.Forms.TabAlignment.Bottom;
          this.theTabControl.Controls.Add(this.gameViewTabPage);
-         this.theTabControl.Controls.Add(this.tabPage2);
+         this.theTabControl.Controls.Add(this.manifestTabPage);
          this.theTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
          this.theTabControl.Location = new System.Drawing.Point(0, 0);
          this.theTabControl.Name = "theTabControl";
@@ -183,6 +190,44 @@ namespace RePopCraftingStudio
          this.recipeTreeView.TabIndex = 0;
          this.recipeTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.recipeTreeView_AfterSelect);
          // 
+         // manifestTabPage
+         // 
+         this.manifestTabPage.Controls.Add(this.manifestViewSplitContainer);
+         this.manifestTabPage.Location = new System.Drawing.Point(4, 4);
+         this.manifestTabPage.Name = "manifestTabPage";
+         this.manifestTabPage.Padding = new System.Windows.Forms.Padding(3);
+         this.manifestTabPage.Size = new System.Drawing.Size(536, 625);
+         this.manifestTabPage.TabIndex = 1;
+         this.manifestTabPage.Text = "Manifest";
+         this.manifestTabPage.UseVisualStyleBackColor = true;
+         // 
+         // manifestViewSplitContainer
+         // 
+         this.manifestViewSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.manifestViewSplitContainer.Location = new System.Drawing.Point(3, 3);
+         this.manifestViewSplitContainer.Name = "manifestViewSplitContainer";
+         this.manifestViewSplitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
+         // 
+         // manifestViewSplitContainer.Panel1
+         // 
+         this.manifestViewSplitContainer.Panel1.Controls.Add(this.manifestTreeView);
+         // 
+         // manifestViewSplitContainer.Panel2
+         // 
+         this.manifestViewSplitContainer.Panel2.Controls.Add(this.manifestTextBox);
+         this.manifestViewSplitContainer.Size = new System.Drawing.Size(530, 619);
+         this.manifestViewSplitContainer.SplitterDistance = 373;
+         this.manifestViewSplitContainer.TabIndex = 0;
+         // 
+         // manifestTreeView
+         // 
+         this.manifestTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.manifestTreeView.Location = new System.Drawing.Point(0, 0);
+         this.manifestTreeView.Name = "manifestTreeView";
+         this.manifestTreeView.Size = new System.Drawing.Size(530, 373);
+         this.manifestTreeView.TabIndex = 0;
+         this.manifestTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.manifestTreeView_AfterSelect);
+         // 
          // recipeResultsListView
          // 
          this.recipeResultsListView.AlternateLineItemColor = System.Drawing.Color.LightCyan;
@@ -199,15 +244,15 @@ namespace RePopCraftingStudio
          this.recipeResultsListView.View = System.Windows.Forms.View.Details;
          this.recipeResultsListView.SelectedIndexChanged += new System.EventHandler(this.recipeResultsListView_SelectedIndexChanged);
          // 
-         // tabPage2
+         // manifestTextBox
          // 
-         this.tabPage2.Location = new System.Drawing.Point(4, 4);
-         this.tabPage2.Name = "tabPage2";
-         this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-         this.tabPage2.Size = new System.Drawing.Size(536, 625);
-         this.tabPage2.TabIndex = 1;
-         this.tabPage2.Text = "tabPage2";
-         this.tabPage2.UseVisualStyleBackColor = true;
+         this.manifestTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.manifestTextBox.Location = new System.Drawing.Point(0, 0);
+         this.manifestTextBox.Multiline = true;
+         this.manifestTextBox.Name = "manifestTextBox";
+         this.manifestTextBox.ReadOnly = true;
+         this.manifestTextBox.Size = new System.Drawing.Size(530, 242);
+         this.manifestTextBox.TabIndex = 0;
          // 
          // MainForm
          // 
@@ -231,6 +276,11 @@ namespace RePopCraftingStudio
          this.gameViewSplitContainer.Panel1.ResumeLayout(false);
          this.gameViewSplitContainer.Panel2.ResumeLayout(false);
          this.gameViewSplitContainer.ResumeLayout(false);
+         this.manifestTabPage.ResumeLayout(false);
+         this.manifestViewSplitContainer.Panel1.ResumeLayout(false);
+         this.manifestViewSplitContainer.Panel2.ResumeLayout(false);
+         this.manifestViewSplitContainer.Panel2.PerformLayout();
+         this.manifestViewSplitContainer.ResumeLayout(false);
          this.ResumeLayout(false);
 
         }
@@ -248,8 +298,11 @@ namespace RePopCraftingStudio
         //private EntityListView recipeResultsListView;
         private System.Windows.Forms.TabControl theTabControl;
         private System.Windows.Forms.TabPage gameViewTabPage;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage manifestTabPage;
         private EntityListView recipeResultsListView;
+        private System.Windows.Forms.SplitContainer manifestViewSplitContainer;
+        private System.Windows.Forms.TreeView manifestTreeView;
+        private System.Windows.Forms.TextBox manifestTextBox;
 
     }
 }

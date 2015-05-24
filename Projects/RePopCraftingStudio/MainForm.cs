@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using RePopCrafting;
 using RePopCraftingStudio.Db;
@@ -52,8 +55,7 @@ namespace RePopCraftingStudio
          _recipeResultsListViewController.Clear();
          _recipeTreeViewController.Fill( _db.SelectRecipesForItem( item ) );
 
-
-         _db.BuildManifest( item.ItemId );
+         FillManifiestTreeView( _db.BuildManifest( item.ItemId ) );
       }
 
       private void itemFilterTextBox_KeyUp( object sender, KeyEventArgs e )
@@ -81,6 +83,17 @@ namespace RePopCraftingStudio
          }
       }
 
+      private void manifestTreeView_AfterSelect( object sender, TreeViewEventArgs e )
+      {
+         if ( null == e.Node )
+         {
+            thePropertyGrid.SelectedObject = null;
+            return;
+         }
+
+         thePropertyGrid.SelectedObject = e.Node.Tag;
+      }
+
       private void recipeResultsListView_SelectedIndexChanged( object sender, EventArgs e )
       {
          thePropertyGrid.SelectedObject = _recipeResultsListViewController.SelectedRecipeResult;
@@ -103,6 +116,7 @@ namespace RePopCraftingStudio
          mainSplitContainer.SplitterDistance = Properties.Settings.Default.MainSplitterDistance;
          leftSplitContainer.SplitterDistance = Properties.Settings.Default.LeftSplitterDistance;
          gameViewSplitContainer.SplitterDistance = Properties.Settings.Default.GameViewSplitterDistance;
+         manifestViewSplitContainer.SplitterDistance = Properties.Settings.Default.ManifestViewSplitterDistance;
          theTabControl.SelectedIndex = Properties.Settings.Default.LastTabIndex;
          _db.ConnectionString = Properties.Settings.Default.ConnectionString;
 
@@ -138,11 +152,97 @@ namespace RePopCraftingStudio
          Properties.Settings.Default.MainSplitterDistance = mainSplitContainer.SplitterDistance;
          Properties.Settings.Default.LeftSplitterDistance = leftSplitContainer.SplitterDistance;
          Properties.Settings.Default.GameViewSplitterDistance = gameViewSplitContainer.SplitterDistance;
+         Properties.Settings.Default.ManifestViewSplitterDistance = manifestViewSplitContainer.SplitterDistance;
          Properties.Settings.Default.LastItemFilter = itemFilterTextBox.Text;
          Properties.Settings.Default.LastTabIndex = theTabControl.SelectedIndex;
          Properties.Settings.Default.ConnectionString = _db.ConnectionString;
 
          Properties.Settings.Default.Save();
+      }
+
+      private void FillManifiestTreeView( ItemManifest itemManifest )
+      {
+         manifestTreeView.Nodes.Clear();
+
+         if (null == itemManifest)
+         {
+            manifestTreeView.Nodes.Add( @"no manifest available." );
+            return;
+         }
+
+         TreeNode node = manifestTreeView.Nodes.Add( itemManifest.Item.Name );
+         AddManifestNode( node, itemManifest );
+
+         node.ExpandAll();
+
+
+         manifestTextBox.Text = string.Empty;
+         IDictionary<string, long> manifest = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+         AddToManifest( node, manifest );
+
+         StringBuilder builder = new StringBuilder();
+         foreach ( string key in manifest.Keys )
+         {
+            builder.AppendFormat(@"{0}: {1}", key, manifest[key]);
+            builder.AppendLine();
+         }
+         manifestTextBox.Text = builder.ToString();
+
+         string more = manifestTextBox.Text.Replace("\r\n", ", ");
+         manifestTextBox.Text += "\r\n\r\n" + more;
+      }
+
+      private void AddToManifest( TreeNode parent, IDictionary<string, long> manifest )
+      {
+         foreach (TreeNode child in parent.Nodes)
+         {
+            if (0 == child.Nodes.Count)
+            {
+               ItemManifest.Entry entry = (ItemManifest.Entry) child.Tag;
+               if (entry.IsSpecific)
+               {
+                  if (!manifest.ContainsKey(entry.SpecificItem.Name))
+                     manifest[entry.SpecificItem.Name] = 0;
+                  manifest[entry.SpecificItem.Name]++;
+               }
+               else
+               {
+                  if ( !manifest.ContainsKey( entry.Component.Name ) )
+                     manifest[ entry.Component.Name ] = 0;
+                  manifest[ entry.Component.Name ]++;
+               }
+            }
+            else
+            {
+               AddToManifest( child, manifest );
+            }
+         }
+
+      }
+
+      private void AddManifestNode( TreeNode parent, ItemManifest itemManifest )
+      {
+         if ( null == itemManifest )
+         {
+            return;
+         }
+
+         foreach ( ItemManifest.Entry ingredient in itemManifest.Ingredients )
+         {
+            TreeNode node = parent.Nodes.Add( ingredient.IsSpecific ? ingredient.SpecificItem.Name : ingredient.Component.Name );
+            node.Tag = ingredient;
+            if ( ingredient.IsSpecific )
+            {
+               AddManifestNode( node, _db.BuildManifest( ingredient.SpecificItem.ItemId ) );
+            }
+         }
+
+         foreach ( ItemManifest.Entry agent in itemManifest.Agents )
+         {
+            TreeNode node = parent.Nodes.Add( agent.Component.Name );
+            node.Tag = agent;
+            AddManifestNode( node, _db.BuildManifest( agent.SpecificItem.ItemId ) );
+         }
       }
    }
 }

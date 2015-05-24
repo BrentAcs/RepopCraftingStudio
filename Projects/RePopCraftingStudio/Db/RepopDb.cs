@@ -284,9 +284,20 @@ namespace RePopCraftingStudio.Db
          // Get recipe results where resultId = itemId && groupId = 1
          IEnumerable<RecipeResult> recipeResults = SelectRecipeResultsForItem( itemId, 1 );
          LogInfo( @"Selected {0} recipe results.", recipeResults.Count() );
+         if ( !recipeResults.Any() )
+            return null;
 
          // NOTE: will need to address multipe results next, for now use first recipe result
          RecipeResult recipeResult = recipeResults.First();
+         switch (recipeResult.Type)
+         {
+            case ResultTypes.Item:           // pass thru...
+               break;
+            case ResultTypes.Fitting:        // pass thru
+               break;
+            case ResultTypes.Blueprint:
+               return null;
+         }
 
          // Get each ingredient entry component Id
          long[] componentIds = SelectComponentIdsForRecipeIngredients( recipeResult.RecipeId );
@@ -431,7 +442,7 @@ namespace RePopCraftingStudio.Db
 
    public class ItemManifest
    {
-      [DebuggerDisplay(@"{Component}")]
+      [DebuggerDisplay( @"{Component}" )]
       public class Entry
       {
          public CraftingComponent Component { get; private set; }
