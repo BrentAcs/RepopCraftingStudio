@@ -1,55 +1,69 @@
 
 
-want to make Sulfuric Acid (974)
+Genetically Engineered Setlang
+	[x] recipe: Basic Genetic Recombination
+		[x] Result A
+			i. Primary DNA (Setlang)
+			i. Secondary DNA
+				[X] Raxin
+				[ ] Drake
+				[ ] Elkar
+				[ ] Scaed'ecco
+			a. Biomass
+			a. Ligase
+			a. Prion Vector
 
-
-get filterId from recipe_results														: 135
-get componentId from recipe_ingredients where recipeId matches and ingSlot == filter #	: 139
-get itemId's from item_crafting_filter where filterId is from recipe_results			: 60, 1260, 1462, 1725
-get itemId's from item_crafting_components where componentId is from recipe_ingredients	: 106,1255,1261,1264,1270,1464,1481,2155,2221,2725,58,59,605,60,61,62,63,639,64,65,67,68,69,70,,934,935
-the UNION of this is the ITEM used is the input item
-
-
-
--- the # of rows will be number of unique possibilies
-select filter1id, filter2id, filter3id, filter4id from recipe_results where resultId = 974 and grade = 1
-141, 135, 0, 0, 0
-
-select componentId from recipe_ingredients where recipeId=141 and ingSlot=1
-139
-
-SELECT * FROM Item_Crafting_Filters
-INNER JOIN item_crafting_components ON (Item_Crafting_Components.itemID = Item_Crafting_Filters.itemID)
-WHERE Item_Crafting_Components.componentID = 139 AND Item_Crafting_Filters.filterID = 135
-
-
-
---select itemId from item_crafting_filters where filterId=135
-60, 1260, 1462, 1725
-
---select itemId from item_crafting_components where componentId = 139
-106,1255,1261,1264,1270,1464,1481,2155,2221,2725,58,59,605,60,61,62,63,639,64,65,67,68,69,70,,934,935
-
-
-
-
-select filter1id, filter2id, filter3id, filter4id from recipe_results where resultId = 442 and grade = 1
-
-
-
-SELECT DISTINCT * FROM Item_Crafting_Filters
-INNER JOIN Item_Crafting_Components ON (Item_Crafting_Components.itemID = Item_Crafting_Filters.itemID)
-INNER JOIN Recipe_Ingredients ON (Recipe_Ingredients.componentID = Item_Crafting_Components.componentID)
-INNER JOIN Recipe_Results ON 
-
-(Recipe_Results.recipeID = Recipe_Ingredients.recipeID AND Recipe_Results.filter1ID = Item_Crafting_Filters.filterID)
+		--- OR ---	
+			
+		[x] Result A
+			i. Primary DNA (Setlang)
+			i. Secondary DNA (Raxin)
+			a. Biomass
+				[x] recipe: Biomass Reclamation
+					[x] Result A
+						i. tissue Sample
+						a. Sterilizing Agent
+			a. Ligase
+			a. Prion Vector 		
+		[ ] Result B
+			i. Primary DNA (Setlang)
+			i. Secondary DNA (Drake)
+			a. Biomass
+			a. Ligase
+			a. Prion Vector
+		[ ] Result C
+			i. Primary DNA (Setlang)
+			i. Secondary DNA (Elkar)
+			a. Biomass
+			a. Ligase
+			a. Prion Vector
+		[ ] Result C
+			i. Primary DNA (Setlang)
+			i. Secondary DNA (Scaed'ecco)
+			a. Biomass
+			a. Ligase
+			a. Prion Vector
+			
+			
+			
+			
 	
---	(Recipe_Results.filter1ID = Item_Crafting_Filters.filterID OR 
---	 Recipe_Results.filter2ID = Item_Crafting_Filters.filterID OR 
---	 Recipe_Results.filter3ID = Item_Crafting_Filters.filterID OR 
---	 Recipe_Results.filter4ID = Item_Crafting_Filters.filterID))
-
-WHERE Item_Crafting_Filters.filterID <> 0 AND Recipe_Results.recipeID = 141 AND Recipe_Results.grade = 1 AND ResultId=974
-
-
-
+Type A Firearms Fitting
+	[x] recipe: Type A Firearms Fitting
+		[x] Result A
+			i. Refined Metal
+			i. Type A Firearms Fitting Mold
+			i. Power Core
+			i. Motherboard
+			a. Bonding Agent
+			a. wires
+			a. sealing agent		
+		
+	[ ] recipe: Recycled Firearms Firearms
+		[ ] Result A
+			i. Refined Metal
+			i. Firearms Fitting Mold
+			i. Salvageable Fitting Module
+			a. Bonding Agent
+			a. wires
+			a. sealing agent		

@@ -35,5 +35,8 @@
     <Setting Name="ManifestViewSplitterDistance" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">128</Value>
     </Setting>
+    <Setting Name="LastSelectionTabIndex" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

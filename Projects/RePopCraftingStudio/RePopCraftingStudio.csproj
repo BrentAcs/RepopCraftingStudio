@@ -57,6 +57,7 @@
     <Compile Include="Dialogs\ExceptionDialog.Designer.cs">
       <DependentUpon>ExceptionDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\EntityColumnAttribute.cs" />
     <Compile Include="UserControls\EntityListView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -74,6 +75,22 @@
     <Compile Include="RecipeResultsListViewController.cs" />
     <Compile Include="RecipeTreeViewController.cs" />
     <Compile Include="Db\RepopDb.cs" />
+    <Compile Include="UserControls\EventArgs.cs" />
+    <Compile Include="UserControls\ItemListSelection.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\ItemListSelection.Designer.cs">
+      <DependentUpon>ItemListSelection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ManifestCreater.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\ManifestCreater.Designer.cs">
+      <DependentUpon>ManifestCreater.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\OurUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <EmbeddedResource Include="Dialogs\ExceptionDialog.resx">
       <DependentUpon>ExceptionDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -90,6 +107,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="UserControls\ItemListSelection.resx">
+      <DependentUpon>ItemListSelection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControls\ManifestCreater.resx">
+      <DependentUpon>ManifestCreater.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
