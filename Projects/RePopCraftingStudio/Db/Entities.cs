@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using RePopCrafting;
@@ -242,6 +243,34 @@ namespace RePopCraftingStudio.Db
             throw new ArgumentOutOfRangeException( @"index in GetFilterId is out of range." );
 
          return (long)Items[ 6 + index ];
+      }
+   }
+
+   public class IngredientSlotInfo
+   {
+      public int IngSlot { get; set; }
+      public IEnumerable<Item> Items { get; set; }
+      public CraftingComponent Component { get; set; }
+
+      public bool IsSpecific { get { return 1 == Items.Count(); } }
+      public string DisplayName { get { return IsSpecific ? Items.First().Name : Component.Name; } }
+      public Entity Entity { get { return IsSpecific ? (Entity)Items.First() : Component; } }
+   }
+
+   public static class IngredientSlotInfoExtensions
+   {
+      public static string GetSpecificItemNames( this IEnumerable<IngredientSlotInfo> infos )
+      {
+         string names = string.Empty;
+         foreach ( IngredientSlotInfo info in infos )
+         {
+            if ( info.IsSpecific )
+               names += info.Items.First().Name + @", ";
+         }
+         if (string.IsNullOrEmpty(names))
+            names = @"Nothing specific";
+
+         return names;
       }
    }
 }

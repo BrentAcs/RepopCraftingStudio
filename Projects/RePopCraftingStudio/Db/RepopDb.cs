@@ -31,6 +31,10 @@ namespace RePopCraftingStudio.Db
       }
 
       // "crafting_components" table access
+      public CraftingComponent SelectCraftingComponentById( long componentId )
+      {
+         return new CraftingComponent( this, GetDataRow( @"select * from crafting_components where componentId = {0}", componentId ).ItemArray );
+      }
 
       // "Fittings" table access
       public IEnumerable<Fitting> SelectFittingsByName( string filter )
@@ -74,27 +78,72 @@ namespace RePopCraftingStudio.Db
 
       //public IEnumerable<Item> GetsItemsByRecipeIdAndFilterIdAndIngSlot( long recipeId, long filterId, int ingSlot )
 
-      public IEnumerable<Item> GetsItemsForRecipeResultAndIngSlot( RecipeResult recipeResult, int ingSlot )
-      {
-         //         string sql = string.Format(
-         //@"select * from item_crafting_filters
-         //	inner join item_crafting_components on (item_crafting_components.itemid = item_crafting_filters.itemid)
-         //	where item_crafting_components.componentid in
-         //		(select componentid from recipe_ingredients where recipeid={0} and ingslot={1})
-         //	and item_crafting_filters.filterid = {2}", recipeId, ingSlot, filterId );
+      //      public IEnumerable<Item> GetsItemsForRecipeResultAndIngSlot( RecipeResult recipeResult, int ingSlot )
+      //      {
+      //         //         string sql = string.Format(
+      //         //@"select * from item_crafting_filters
+      //         //	inner join item_crafting_components on (item_crafting_components.itemid = item_crafting_filters.itemid)
+      //         //	where item_crafting_components.componentid in
+      //         //		(select componentid from recipe_ingredients where recipeid={0} and ingslot={1})
+      //         //	and item_crafting_filters.filterid = {2}", recipeId, ingSlot, filterId );
 
+      //         IList<Item> items = new List<Item>();
+      //         var rows = GetDataRows( @"select * from item_crafting_filters
+      //	         inner join item_crafting_components on (item_crafting_components.itemid = item_crafting_filters.itemid)
+      //	         where item_crafting_components.componentid in
+      //		         (select componentid from recipe_ingredients where recipeid={0} and ingslot={1})
+      //	         and item_crafting_filters.filterid = {2}", recipeResult.RecipeId, ingSlot, recipeResult.GetFilterId( ingSlot ) );
+      //         foreach ( DataRow row in rows )
+      //         {
+      //            items.Add( GetItemById( (long)rows[ 0 ][ @"itemId" ] ) );
+      //         }
+
+      //         return items;
+      //      }
+
+
+      // TODO:  get working and move this
+      public IEnumerable<IngredientSlotInfo> GetIngredientSlotInfoForRecipeResults( RecipeResult recipeResult )
+      {
+         IList<IngredientSlotInfo> slotInfos = new List<IngredientSlotInfo>();
+         for ( int ingSlot = 1; ingSlot < 5; ingSlot++ )
+         {
+            IngredientSlotInfo slotInfo = GetIngredientSlotInfoForRecipeResultAndIngSlot( recipeResult, ingSlot );
+            if ( null != slotInfo )
+               slotInfos.Add( slotInfo );
+         }
+
+         return slotInfos;
+      }
+
+      public IngredientSlotInfo GetIngredientSlotInfoForRecipeResultAndIngSlot( RecipeResult recipeResult, int ingSlot )
+      {
          IList<Item> items = new List<Item>();
          var rows = GetDataRows( @"select * from item_crafting_filters
 	         inner join item_crafting_components on (item_crafting_components.itemid = item_crafting_filters.itemid)
 	         where item_crafting_components.componentid in
 		         (select componentid from recipe_ingredients where recipeid={0} and ingslot={1})
-	         and item_crafting_filters.filterid = {2}", recipeResult.RecipeId, ingSlot, recipeResult.GetFilterId( ingSlot ) );
+	         and item_crafting_filters.filterid = {2}",
+            recipeResult.RecipeId, ingSlot, recipeResult.GetFilterId( ingSlot ) );
+         if ( 0 == rows.Count )
+         {
+            rows = GetDataRows( @"select * from item_crafting_components where componentid in
+		            (select componentid from recipe_ingredients where recipeid={0} and ingslot={1})",
+               recipeResult.RecipeId, ingSlot );
+         }
+         if ( 0 == rows.Count )
+            return null;
+
          foreach ( DataRow row in rows )
          {
-            items.Add( GetItemById( (long)rows[ 0 ][ @"itemId" ] ) );
+            items.Add( GetItemById( (long)row[ @"itemId" ] ) );
          }
-
-         return items;
+         return new IngredientSlotInfo
+            {
+               IngSlot = ingSlot,
+               Items = items,
+               Component = SelectCraftingComponentById( (long)rows[ 0 ][ @"componentId" ] ),
+            };
       }
 
       // "recipes" table access
@@ -196,11 +245,6 @@ namespace RePopCraftingStudio.Db
       //      items.Add( SelectItemById( id ) );
       //   }
       //   return items;
-      //}
-
-      //public CraftingComponent SelectCraftingComponentById( long componentId )
-      //{
-      //   return new CraftingComponent( this, GetDataRow( @"select * from crafting_components where componentId = {0}", componentId ).ItemArray );
       //}
 
       //public IEnumerable<Recipe> SelectRecipesForItem( Item item )
