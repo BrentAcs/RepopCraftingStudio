@@ -34,11 +34,13 @@
          // theTreeView
          // 
          this.theTreeView.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-         this.theTreeView.CheckBoxes = true;
          this.theTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.theTreeView.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+         this.theTreeView.ForeColor = System.Drawing.Color.Yellow;
          this.theTreeView.HideSelection = false;
          this.theTreeView.Location = new System.Drawing.Point(0, 0);
          this.theTreeView.Name = "theTreeView";
+         this.theTreeView.ShowNodeToolTips = true;
          this.theTreeView.ShowRootLines = false;
          this.theTreeView.Size = new System.Drawing.Size(639, 714);
          this.theTreeView.TabIndex = 0;

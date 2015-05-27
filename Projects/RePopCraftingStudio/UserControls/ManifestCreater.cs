@@ -97,14 +97,11 @@ namespace RePopCraftingStudio.UserControls
                return;
 
             TreeNode root = theTreeView.Nodes.Add( _rootEntity.Name );
-            root.Checked = true;
-            root.ForeColor = Color.Yellow;
             root.Tag = _rootEntity;
 
             AddRecipes( root, _rootEntity.Id, _rootEntity.EntityType );
 
             root.ExpandAll();
-            root.Nodes.CheckNode( 0 );
          }
          finally
          {
@@ -116,44 +113,92 @@ namespace RePopCraftingStudio.UserControls
       private void AddRecipes( TreeNode entityNode, long entityId, EntityTypes entityType )
       {
          IEnumerable<Recipe> recipes = Db.SelectRecipesByResultIdandType( entityId, entityType );
-         foreach ( Recipe recipe in recipes )
+         Debug.Assert( recipes.Any() );
+         if ( !recipes.Any() )
+            return;
+
+         AddRecipeToNode( entityNode, recipes, recipes.First() );
+      }
+
+      private void AddRecipeToNode( TreeNode paentNode, IEnumerable<Recipe> recipes, Recipe recipe )
+      {
+         TreeNode child = paentNode.Nodes.Add( recipe.Name );
+         child.Tag = recipe;
+
+         if ( recipes.Count() > 1 )
          {
-            TreeNode child = entityNode.Nodes.Add( string.Format( @"Recipe: {0}", recipe.Name ) );
-            child.ForeColor = Color.Yellow;
-            child.Tag = recipe;
+            string toolTipText = "Item can be made from:\n\n";
+            ContextMenu menu = new ContextMenu();
+            int index = 1;
+            foreach ( Recipe rec in recipes )
+            {
+               menu.MenuItems.Add( new MenuItem( rec.Name, ( sender, args ) =>
+               {
+                  paentNode.Nodes.Clear();
+                  AddRecipeToNode( paentNode, recipes, rec );
+               } ) );
+               toolTipText += string.Format( "{0} - {1}\n", index++, rec.Name );
+            }
 
-            AddRecipeResults( child );
-
-            child.Nodes.CheckNode( 0 );
+            child.ContextMenu = menu;
+            child.ToolTipText = toolTipText;
          }
+
+         AddRecipeResults( child );
       }
 
       private void AddRecipeResults( TreeNode recipeNode )
       {
          Recipe recipe = (Recipe)recipeNode.Tag;
-
          IEnumerable<RecipeResult> recipeResults = Db.SelectRecipeResultsForRecipeAndResult( recipe.RecipeId, _rootEntity.Id );
-         int result = 1;
-         foreach ( RecipeResult recipeResult in recipeResults )
+         Debug.Assert( recipeResults.Any() );
+
+         AddRecipeResultsToNode( recipeNode, recipeResults, recipeResults.First() );
+
+         recipeNode.ExpandAll();
+      }
+
+      private void AddRecipeResultsToNode( TreeNode parentNode, IEnumerable<RecipeResult> recipeResults, RecipeResult recipeResult )
+      {
+         //TreeNode child = parentNode.Nodes.Add(recipeResult.);
+
+         string recipeText = string.Empty;
+         for ( int ingSlot = 1; ingSlot < 5; ingSlot++ )
          {
-            TreeNode child = recipeNode.Nodes.Add( string.Format( @"Result {0}", result++ ) );
-            child.ForeColor = Color.Yellow;
-            child.Tag = recipeResult;
+            IEnumerable<Item> items = Db.GetsItemsForRecipeResultAndIngSlot( recipeResult, ingSlot );
+            Item item = items.FirstOrDefault();
+            if ( null == item )
+               continue;
 
+            Debug.Assert( 1 == items.Count() );
+            recipeText += item.Name + ", ";
 
-            for ( int ingSlot = 1; ingSlot < 5; ingSlot++ )
-            {
-               IEnumerable<Item> items = Db.GetsItemsForRecipeResultAndIngSlot( recipeResult, ingSlot );
-               Item item = items.FirstOrDefault();
-               if (null == item)
-                  continue;
-
-               Debug.Assert( 1 == items.Count() );
-               TreeNode grandChild = child.Nodes.Add(item.Name);
-               grandChild.ForeColor = Color.Yellow;
-               grandChild.Tag = item;
-            }
+            //TreeNode grandChild = child.Nodes.Add( item.Name );
+            //grandChild.Tag = item;
          }
+
+         parentNode.Nodes.Add( recipeText );
+
+
+         //int result = 1;
+         //foreach ( RecipeResult recipeResult in recipeResults )
+         //{
+         //   TreeNode child = recipeNode.Nodes.Add( string.Format( @"Result {0}", result++ ) );
+         //   child.Tag = recipeResult;
+
+         //   //for ( int ingSlot = 1; ingSlot < 5; ingSlot++ )
+         //   //{
+         //   //   IEnumerable<Item> items = Db.GetsItemsForRecipeResultAndIngSlot( recipeResult, ingSlot );
+         //   //   Item item = items.FirstOrDefault();
+         //   //   if ( null == item )
+         //   //      continue;
+
+         //   //   Debug.Assert( 1 == items.Count() );
+         //   //   TreeNode grandChild = child.Nodes.Add( item.Name );
+         //   //   grandChild.Tag = item;
+         //   //}
+         //}
+
       }
 
 
@@ -178,46 +223,46 @@ namespace RePopCraftingStudio.UserControls
       }
    }
 
-   public static class TreeNodeExtensions
-   {
-      public static bool HasRecipe( this TreeNode node )
-      {
-         return node.Tag is Recipe;
-      }
+   //public static class TreeNodeExtensions
+   //{
+   //   public static bool HasRecipe( this TreeNode node )
+   //   {
+   //      return node.Tag is Recipe;
+   //   }
 
-      public static bool HasRecipes( this TreeNodeCollection nodes )
-      {
-         if ( 0 == nodes.Count )
-            throw new InvalidOperationException( @"Empty tree node collection." );
+   //   public static bool HasRecipes( this TreeNodeCollection nodes )
+   //   {
+   //      if ( 0 == nodes.Count )
+   //         throw new InvalidOperationException( @"Empty tree node collection." );
 
-         return nodes[ 0 ].HasRecipe();
-      }
+   //      return nodes[ 0 ].HasRecipe();
+   //   }
 
-      public static bool HasRecipeResult( this TreeNode node )
-      {
-         return node.Tag is RecipeResult;
-      }
+   //   public static bool HasRecipeResult( this TreeNode node )
+   //   {
+   //      return node.Tag is RecipeResult;
+   //   }
 
-      public static bool HasRecipeResults( this TreeNodeCollection nodes )
-      {
-         if ( 0 == nodes.Count )
-            throw new InvalidOperationException( @"Empty tree node collection." );
+   //   public static bool HasRecipeResults( this TreeNodeCollection nodes )
+   //   {
+   //      if ( 0 == nodes.Count )
+   //         throw new InvalidOperationException( @"Empty tree node collection." );
 
-         return nodes[ 0 ].HasRecipeResult();
-      }
+   //      return nodes[ 0 ].HasRecipeResult();
+   //   }
 
-      // check stuff
-      public static void CheckNode( this TreeNodeCollection nodes, int index )
-      {
-         if ( 0 == nodes.Count )
-            return;
-         if ( index < 0 || index > nodes.Count - 1 )
-            throw new ArgumentOutOfRangeException( @"Invalid index in CheckNode(...);" );
+   //   // check stuff
+   //   public static void CheckNode( this TreeNodeCollection nodes, int index )
+   //   {
+   //      if ( 0 == nodes.Count )
+   //         return;
+   //      if ( index < 0 || index > nodes.Count - 1 )
+   //         throw new ArgumentOutOfRangeException( @"Invalid index in CheckNode(...);" );
 
-         for ( int i = 0; i < nodes.Count; i++ )
-         {
-            nodes[ i ].Checked = index == i;
-         }
-      }
-   }
+   //      for ( int i = 0; i < nodes.Count; i++ )
+   //      {
+   //         nodes[ i ].Checked = index == i;
+   //      }
+   //   }
+   //}
 }
