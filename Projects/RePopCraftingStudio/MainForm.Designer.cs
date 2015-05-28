@@ -48,6 +48,7 @@ namespace RePopCraftingStudio
          this.manifestTextBox = new System.Windows.Forms.TextBox();
          this.menuStrip1 = new System.Windows.Forms.MenuStrip();
          this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+         this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
          this.mainSplitContainer.Panel1.SuspendLayout();
          this.mainSplitContainer.Panel2.SuspendLayout();
          this.mainSplitContainer.SuspendLayout();
@@ -64,6 +65,7 @@ namespace RePopCraftingStudio
          this.manifestViewSplitContainer.Panel1.SuspendLayout();
          this.manifestViewSplitContainer.Panel2.SuspendLayout();
          this.manifestViewSplitContainer.SuspendLayout();
+         this.menuStrip1.SuspendLayout();
          this.SuspendLayout();
          // 
          // mainSplitContainer
@@ -273,6 +275,8 @@ namespace RePopCraftingStudio
          // 
          // menuStrip1
          // 
+         this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.optionsToolStripMenuItem});
          this.menuStrip1.Location = new System.Drawing.Point(0, 0);
          this.menuStrip1.Name = "menuStrip1";
          this.menuStrip1.Size = new System.Drawing.Size(1038, 24);
@@ -286,6 +290,13 @@ namespace RePopCraftingStudio
          this.toolStrip1.Size = new System.Drawing.Size(1038, 25);
          this.toolStrip1.TabIndex = 5;
          this.toolStrip1.Text = "toolStrip1";
+         // 
+         // optionsToolStripMenuItem
+         // 
+         this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+         this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+         this.optionsToolStripMenuItem.Text = "&Options";
+         this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
          // 
          // MainForm
          // 
@@ -319,6 +330,8 @@ namespace RePopCraftingStudio
          this.manifestViewSplitContainer.Panel2.ResumeLayout(false);
          this.manifestViewSplitContainer.Panel2.PerformLayout();
          this.manifestViewSplitContainer.ResumeLayout(false);
+         this.menuStrip1.ResumeLayout(false);
+         this.menuStrip1.PerformLayout();
          this.ResumeLayout(false);
          this.PerformLayout();
 
@@ -345,6 +358,7 @@ namespace RePopCraftingStudio
         private ItemListSelection theItemListSelection;
         private System.Windows.Forms.TabPage manifestTabPage;
         private ManifestCreater theManifestCreater;
+        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
 
     }
 }

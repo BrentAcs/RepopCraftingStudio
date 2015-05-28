@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using RePopCrafting;
 using RePopCraftingStudio.Db;
+using RePopCraftingStudio.Dialogs;
 
 namespace RePopCraftingStudio
 {
@@ -55,6 +56,12 @@ namespace RePopCraftingStudio
       private void theManifestCreater_EntitySelected( object sender, UserControls.EntitySelectedEventArgs e )
       {
          SetDebugEntity( e.Entity );
+      }
+
+      private void optionsToolStripMenuItem_Click( object sender, EventArgs e )
+      {
+         OptionsDialog dialog = new OptionsDialog();
+         dialog.ShowDialog(this);
       }
 
       private void itemFilterTextBox_TextChanged( object sender, EventArgs e )

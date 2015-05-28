@@ -215,8 +215,12 @@ namespace RePopCraftingStudio.UserControls
             // this is where the fun begins ...
             if ( info.IsSpecific )
             {
-               child.BackColor = Color.LightGreen;
+               child.BackColor = Color.ForestGreen;
                AddRecipes( child, info.Items.First().ItemId, EntityTypes.Item );
+
+               // indicate a terminal item.
+               if ( 0 == child.Nodes.Count )
+                  child.BackColor = Color.LightGreen;
             }
             else
             {
@@ -235,10 +239,10 @@ namespace RePopCraftingStudio.UserControls
                //   toolTipText += string.Format( "{0} - {1}\n", index++, infos.GetSpecificItemNames() );
                //}
 
-               
+
                child.BackColor = Color.LightPink;
                child.ContextMenu = menu;
-               child.ToolTipText = toolTipText;            
+               child.ToolTipText = toolTipText;
             }
          }
          parent.ExpandAll();
@@ -256,8 +260,11 @@ namespace RePopCraftingStudio.UserControls
             // this is where the fun begins ...
             if ( info.IsSpecific )
             {
-               child.BackColor = Color.LightGreen;
+               child.BackColor = Color.ForestGreen;
                AddRecipes( child, info.Items.First().ItemId, EntityTypes.Item );
+
+               if ( 0 == child.Nodes.Count )
+                  child.BackColor = Color.LightGreen;
             }
             else
             {
@@ -300,9 +307,9 @@ namespace RePopCraftingStudio.UserControls
             GetNodeTags( child, builder );
          }
 
-         if ( parent.Tag is SlotInfo )
+         if ( parent.Tag is RecipeSlotInfo )
          {
-            SlotInfo info = parent.Tag as SlotInfo;
+            RecipeSlotInfo info = parent.Tag as RecipeSlotInfo;
             builder.AddSlotInfo( info );
          }
       }
@@ -324,36 +331,6 @@ namespace RePopCraftingStudio.UserControls
          public EntityTypes EntityType
          {
             get { return IsItem ? EntityTypes.Item : IsFitting ? EntityTypes.Fitting : EntityTypes.Blueprint; }
-         }
-      }
-   }
-
-   public class ManifestBuilder
-   {
-      public ManifestBuilder()
-      {
-         Components = new Dictionary<long, int>();
-         Items = new Dictionary<long, int>();
-      }
-
-      public int SlotCount { get; private set; }
-      public IDictionary<long, int> Components { get; private set; }
-      public IDictionary<long, int> Items { get; private set; }
-
-      public void AddSlotInfo( SlotInfo info )
-      {
-         SlotCount++;
-         if ( info.IsSpecific )
-         {
-            if ( !Items.ContainsKey( info.Items.First().ItemId ) )
-               Items[ info.Items.First().ItemId ] = 0;
-            Items[ info.Items.First().ItemId ]++;
-         }
-         else
-         {
-            if ( !Components.ContainsKey( info.Component.ComponentId ) )
-               Components[ info.Component.ComponentId ] = 0;
-            Components[ info.Component.ComponentId ]++;
          }
       }
    }

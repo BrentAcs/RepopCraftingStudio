@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SQLite">
       <HintPath>..\..\Libs\System.Data.SQLite.dll</HintPath>
@@ -52,11 +53,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Db\Entities.cs" />
+    <Compile Include="Db\RecipeSlotInfo.cs" />
     <Compile Include="Dialogs\ExceptionDialog.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\ExceptionDialog.Designer.cs">
       <DependentUpon>ExceptionDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\OptionsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\OptionsDialog.Designer.cs">
+      <DependentUpon>OptionsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="UserControls\EntityColumnAttribute.cs" />
     <Compile Include="UserControls\EntityListView.cs">
@@ -83,6 +91,7 @@
     <Compile Include="UserControls\ItemListSelection.Designer.cs">
       <DependentUpon>ItemListSelection.cs</DependentUpon>
     </Compile>
+    <Compile Include="ManifestBuilder.cs" />
     <Compile Include="UserControls\ManifestCreater.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -94,6 +103,9 @@
     </Compile>
     <EmbeddedResource Include="Dialogs\ExceptionDialog.resx">
       <DependentUpon>ExceptionDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\OptionsDialog.resx">
+      <DependentUpon>OptionsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
