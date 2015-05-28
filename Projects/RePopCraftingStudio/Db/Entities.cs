@@ -246,7 +246,7 @@ namespace RePopCraftingStudio.Db
       }
    }
 
-   public class AgentSlotInfo
+   public abstract class SlotInfo
    {
       public IEnumerable<Item> Items { get; set; }
       public CraftingComponent Component { get; set; }
@@ -255,8 +255,12 @@ namespace RePopCraftingStudio.Db
       public string DisplayName { get { return IsSpecific ? Items.First().Name : Component.Name; } }
       public Entity Entity { get { return IsSpecific ? (Entity)Items.First() : Component; } }
    }
+   
+   public  class AgentSlotInfo : SlotInfo
+   {
+   }
 
-   public class IngredientSlotInfo : AgentSlotInfo
+   public class IngredientSlotInfo : SlotInfo
    {
       public int IngSlot { get; set; }
    }

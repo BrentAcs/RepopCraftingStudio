@@ -33,6 +33,7 @@ namespace RePopCraftingStudio.UserControls
 
       public override void LoadSettings()
       {
+         manifestSplitContainer.SplitterDistance = Properties.Settings.Default.ManifestViewSplitterDistance;
 
          base.LoadSettings();
       }
@@ -41,6 +42,7 @@ namespace RePopCraftingStudio.UserControls
       {
          base.SaveSettings();
 
+         Properties.Settings.Default.ManifestViewSplitterDistance = manifestSplitContainer.SplitterDistance;
       }
 
       public Entity RootEntity
@@ -106,6 +108,7 @@ namespace RePopCraftingStudio.UserControls
             AddRecipes( root, _rootEntity.Id, _rootEntity.EntityType );
 
             root.ExpandAll();
+            BuildManifest();
          }
          finally
          {
@@ -140,6 +143,8 @@ namespace RePopCraftingStudio.UserControls
                {
                   parentNode.Nodes.Clear();
                   AddRecipeToNode( parentNode, recipes, rec, entityId );
+                  parentNode.ExpandAll();
+                  //BuildManifest();
                } ) );
                toolTipText += string.Format( "{0} - {1}\n", index++, rec.Name );
             }
@@ -183,6 +188,7 @@ namespace RePopCraftingStudio.UserControls
                {
                   parentNode.Nodes.Clear();
                   AddRecipeResultsToNode( parentNode, recipeResults, rec );
+                  parentNode.ExpandAll();
                } ) );
                toolTipText += string.Format( "{0} - {1}\n", index++, infos.GetSpecificItemNames() );
             }
@@ -195,6 +201,7 @@ namespace RePopCraftingStudio.UserControls
 
          AddRecipeResultIngredients( child );
          AddRecipeResultAgents( child );
+         //BuildManifest();
       }
 
       private void AddRecipeResultIngredients( TreeNode parent )
@@ -246,6 +253,47 @@ namespace RePopCraftingStudio.UserControls
          }
       }
 
+
+      // ================================================================================
+      private int buildCounter = 1;
+      private void BuildManifest()
+      {
+         manifestTextBox.Text = string.Format( "Manifest build # {0} for {1}\r\n", buildCounter++, theTreeView.Nodes[ 0 ].Text );
+
+         //List<object> stuffs = new List<object>();
+         ManifestBuilder manifest = new ManifestBuilder();
+         GetNodeTags( theTreeView.Nodes[ 0 ], manifest );
+
+         StringBuilder builder = new StringBuilder();
+         builder.AppendLine( "Items:" );
+         foreach ( KeyValuePair<long, int> pair in manifest.Items )
+         {
+            builder.AppendFormat( "{0}: {1}\r\n", Db.GetItemName( pair.Key ), pair.Value );
+         }
+
+         builder.AppendLine( "\r\nComponents:" );
+         foreach ( KeyValuePair<long, int> pair in manifest.Components )
+         {
+            builder.AppendFormat( "{0}: {1}\r\n", Db.SelectCraftingComponentById( pair.Key ).Name, pair.Value );
+         }
+
+         manifestTextBox.Text += builder.ToString();
+      }
+
+      private void GetNodeTags( TreeNode parent, ManifestBuilder builder )
+      {
+         foreach ( TreeNode child in parent.Nodes )
+         {
+            GetNodeTags( child, builder );
+         }
+
+         if ( parent.Tag is SlotInfo )
+         {
+            SlotInfo info = parent.Tag as SlotInfo;
+            builder.AddSlotInfo( info );
+         }
+      }
+
       internal class CraftableEntity
       {
          public CraftableEntity( NamedEntity entity )
@@ -263,6 +311,36 @@ namespace RePopCraftingStudio.UserControls
          public EntityTypes EntityType
          {
             get { return IsItem ? EntityTypes.Item : IsFitting ? EntityTypes.Fitting : EntityTypes.Blueprint; }
+         }
+      }
+   }
+
+   public class ManifestBuilder
+   {
+      public ManifestBuilder()
+      {
+         Components = new Dictionary<long, int>();
+         Items = new Dictionary<long, int>();
+      }
+
+      public int SlotCount { get; private set; }
+      public IDictionary<long, int> Components { get; private set; }
+      public IDictionary<long, int> Items { get; private set; }
+
+      public void AddSlotInfo( SlotInfo info )
+      {
+         SlotCount++;
+         if ( info.IsSpecific )
+         {
+            if ( !Items.ContainsKey( info.Items.First().ItemId ) )
+               Items[ info.Items.First().ItemId ] = 0;
+            Items[ info.Items.First().ItemId ]++;
+         }
+         else
+         {
+            if ( !Components.ContainsKey( info.Component.ComponentId ) )
+               Components[ info.Component.ComponentId ] = 0;
+            Components[ info.Component.ComponentId ]++;
          }
       }
    }
