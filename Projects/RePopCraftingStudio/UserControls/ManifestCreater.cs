@@ -144,7 +144,6 @@ namespace RePopCraftingStudio.UserControls
                   parentNode.Nodes.Clear();
                   AddRecipeToNode( parentNode, recipes, rec, entityId );
                   parentNode.ExpandAll();
-                  //BuildManifest();
                } ) );
                toolTipText += string.Format( "{0} - {1}\n", index++, rec.Name );
             }
@@ -201,7 +200,7 @@ namespace RePopCraftingStudio.UserControls
 
          AddRecipeResultIngredients( child );
          AddRecipeResultAgents( child );
-         //BuildManifest();
+         BuildManifest();
       }
 
       private void AddRecipeResultIngredients( TreeNode parent )
@@ -221,12 +220,26 @@ namespace RePopCraftingStudio.UserControls
             }
             else
             {
+               string toolTipText = "you are tired, and you left off here.:\n\n";
+               ContextMenu menu = new ContextMenu();
+               int index = 1;
+               //foreach ( RecipeResult rec in recipeResults )
+               //{
+               //   IEnumerable<IngredientSlotInfo> infos = Db.GetIngredientSlotsInfoForRecipeResult( rec );
+               //   menu.MenuItems.Add( new MenuItem( infos.GetSpecificItemNames(), ( sender, args ) =>
+               //   {
+               //      parentNode.Nodes.Clear();
+               //      AddRecipeResultsToNode( parentNode, recipeResults, rec );
+               //      parentNode.ExpandAll();
+               //   } ) );
+               //   toolTipText += string.Format( "{0} - {1}\n", index++, infos.GetSpecificItemNames() );
+               //}
+
+               
                child.BackColor = Color.LightPink;
-
-               // TEST CODE
-               //AddRecipes( child, info.Items.First().ItemId, EntityTypes.Item );
+               child.ContextMenu = menu;
+               child.ToolTipText = toolTipText;            
             }
-
          }
          parent.ExpandAll();
       }

@@ -79,6 +79,7 @@
          this.manifestTextBox.ReadOnly = true;
          this.manifestTextBox.Size = new System.Drawing.Size(639, 336);
          this.manifestTextBox.TabIndex = 0;
+         this.manifestTextBox.WordWrap = false;
          // 
          // ManifestCreater
          // 

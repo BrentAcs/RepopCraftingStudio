@@ -139,10 +139,11 @@ namespace RePopCraftingStudio
          mainSplitContainer.SplitterDistance = Properties.Settings.Default.MainSplitterDistance;
          leftSplitContainer.SplitterDistance = Properties.Settings.Default.LeftSplitterDistance;
          gameViewSplitContainer.SplitterDistance = Properties.Settings.Default.GameViewSplitterDistance;
-         manifestViewSplitContainer.SplitterDistance = Properties.Settings.Default.ManifestViewSplitterDistance;
+         //manifestViewSplitContainer.SplitterDistance = Properties.Settings.Default.ManifestViewSplitterDistance;
          theTabControl.SelectedIndex = Properties.Settings.Default.LastTabIndex;
 
          theItemListSelection.LoadSettings();
+         theManifestCreater.LoadSettings();
       }
 
       private void SaveSettings()
@@ -152,11 +153,12 @@ namespace RePopCraftingStudio
          Properties.Settings.Default.MainSplitterDistance = mainSplitContainer.SplitterDistance;
          Properties.Settings.Default.LeftSplitterDistance = leftSplitContainer.SplitterDistance;
          Properties.Settings.Default.GameViewSplitterDistance = gameViewSplitContainer.SplitterDistance;
-         Properties.Settings.Default.ManifestViewSplitterDistance = manifestViewSplitContainer.SplitterDistance;
+         //Properties.Settings.Default.ManifestViewSplitterDistance = manifestViewSplitContainer.SplitterDistance;
          Properties.Settings.Default.LastTabIndex = theTabControl.SelectedIndex;
          Properties.Settings.Default.ConnectionString = _db.ConnectionString;
 
          theItemListSelection.SaveSettings();
+         theManifestCreater.SaveSettings();
 
          Properties.Settings.Default.Save();
       }
