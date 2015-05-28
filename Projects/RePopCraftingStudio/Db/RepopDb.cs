@@ -30,6 +30,32 @@ namespace RePopCraftingStudio.Db
          ConnectionString = connectionString;
       }
 
+      // Agent Slot Info
+      public IEnumerable<AgentSlotInfo> GetAgentSlotInfosForRecipeResult( RecipeResult recipeResult )
+      {
+         IList<AgentSlotInfo> slotInfos = new List<AgentSlotInfo>();
+         var componentRows = GetDataRows( @"select componentId from recipe_agents where recipeId = {0}", recipeResult.RecipeId );
+         foreach ( DataRow componentRow in componentRows )
+         {
+            long componentId = (long)componentRow[ @"componentId" ];
+            IList<Item> items = new List<Item>();
+            var itemRows = GetDataRows( @"select itemId from item_crafting_components where componentId = {0}", componentId );
+            foreach ( DataRow row in itemRows )
+            {
+               items.Add( GetItemById( (long)row[ @"itemId" ] ) );
+            }
+
+            AgentSlotInfo slot = new AgentSlotInfo
+            {
+               Component = SelectCraftingComponentById( componentId ),
+               Items = items,
+            };
+            slotInfos.Add( slot );
+         }
+
+         return slotInfos;
+      }
+
       // "crafting_components" table access
       public CraftingComponent SelectCraftingComponentById( long componentId )
       {
@@ -49,61 +75,8 @@ namespace RePopCraftingStudio.Db
          return SelectFittingsByName( filter ).OfType<Entity>();
       }
 
-      // "Items" table access
-      public string GetItemName( long itemId )
-      {
-         if ( 0 == itemId )
-            return string.Empty;
-         return (string)GetDataRow( @"select displayName from items where itemId = {0}", itemId ).ItemArray[ 0 ];
-      }
-
-      public Item GetItemById( long itemId )
-      {
-         if ( 0 == itemId )
-            return null;
-         return new Item( this, GetDataRow( @"select * from items where itemId = {0}", itemId ).ItemArray );
-      }
-
-      public IEnumerable<Item> SelectItemsByName( string filter )
-      {
-         return RowsToEntities(
-            GetDataRows( @"select * from items where displayName like '%{0}%'", filter ),
-            r => new Item( this, r.ItemArray ) );
-      }
-
-      public IEnumerable<Entity> SelectItemEntitiesByName( string filter )
-      {
-         return SelectItemsByName( filter ).OfType<Entity>();
-      }
-
-      //public IEnumerable<Item> GetsItemsByRecipeIdAndFilterIdAndIngSlot( long recipeId, long filterId, int ingSlot )
-
-      //      public IEnumerable<Item> GetsItemsForRecipeResultAndIngSlot( RecipeResult recipeResult, int ingSlot )
-      //      {
-      //         //         string sql = string.Format(
-      //         //@"select * from item_crafting_filters
-      //         //	inner join item_crafting_components on (item_crafting_components.itemid = item_crafting_filters.itemid)
-      //         //	where item_crafting_components.componentid in
-      //         //		(select componentid from recipe_ingredients where recipeid={0} and ingslot={1})
-      //         //	and item_crafting_filters.filterid = {2}", recipeId, ingSlot, filterId );
-
-      //         IList<Item> items = new List<Item>();
-      //         var rows = GetDataRows( @"select * from item_crafting_filters
-      //	         inner join item_crafting_components on (item_crafting_components.itemid = item_crafting_filters.itemid)
-      //	         where item_crafting_components.componentid in
-      //		         (select componentid from recipe_ingredients where recipeid={0} and ingslot={1})
-      //	         and item_crafting_filters.filterid = {2}", recipeResult.RecipeId, ingSlot, recipeResult.GetFilterId( ingSlot ) );
-      //         foreach ( DataRow row in rows )
-      //         {
-      //            items.Add( GetItemById( (long)rows[ 0 ][ @"itemId" ] ) );
-      //         }
-
-      //         return items;
-      //      }
-
-
-      // TODO:  get working and move this
-      public IEnumerable<IngredientSlotInfo> GetIngredientSlotInfoForRecipeResults( RecipeResult recipeResult )
+      // Ingredient Slot Info 
+      public IEnumerable<IngredientSlotInfo> GetIngredientSlotsInfoForRecipeResult( RecipeResult recipeResult )
       {
          IList<IngredientSlotInfo> slotInfos = new List<IngredientSlotInfo>();
          for ( int ingSlot = 1; ingSlot < 5; ingSlot++ )
@@ -139,11 +112,38 @@ namespace RePopCraftingStudio.Db
             items.Add( GetItemById( (long)row[ @"itemId" ] ) );
          }
          return new IngredientSlotInfo
-            {
-               IngSlot = ingSlot,
-               Items = items,
-               Component = SelectCraftingComponentById( (long)rows[ 0 ][ @"componentId" ] ),
-            };
+         {
+            IngSlot = ingSlot,
+            Items = items,
+            Component = SelectCraftingComponentById( (long)rows[ 0 ][ @"componentId" ] ),
+         };
+      }
+
+      // "Items" table access
+      public string GetItemName( long itemId )
+      {
+         if ( 0 == itemId )
+            return string.Empty;
+         return (string)GetDataRow( @"select displayName from items where itemId = {0}", itemId ).ItemArray[ 0 ];
+      }
+
+      public Item GetItemById( long itemId )
+      {
+         if ( 0 == itemId )
+            return null;
+         return new Item( this, GetDataRow( @"select * from items where itemId = {0}", itemId ).ItemArray );
+      }
+
+      public IEnumerable<Item> SelectItemsByName( string filter )
+      {
+         return RowsToEntities(
+            GetDataRows( @"select * from items where displayName like '%{0}%'", filter ),
+            r => new Item( this, r.ItemArray ) );
+      }
+
+      public IEnumerable<Entity> SelectItemEntitiesByName( string filter )
+      {
+         return SelectItemsByName( filter ).OfType<Entity>();
       }
 
       // "recipes" table access

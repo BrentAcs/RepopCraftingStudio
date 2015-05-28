@@ -117,16 +117,16 @@ namespace RePopCraftingStudio.UserControls
       private void AddRecipes( TreeNode entityNode, long entityId, EntityTypes entityType )
       {
          IEnumerable<Recipe> recipes = Db.SelectRecipesByResultIdandType( entityId, entityType );
-         Debug.Assert( recipes.Any() );
+         //Debug.Assert( recipes.Any() );
          if ( !recipes.Any() )
             return;
 
-         AddRecipeToNode( entityNode, recipes, recipes.First() );
+         AddRecipeToNode( entityNode, recipes, recipes.First(), entityId );
       }
 
-      private void AddRecipeToNode( TreeNode parentNode, IEnumerable<Recipe> recipes, Recipe recipe )
+      private void AddRecipeToNode( TreeNode parentNode, IEnumerable<Recipe> recipes, Recipe recipe, long entityId )
       {
-         TreeNode child = parentNode.Nodes.Add( recipe.Name );
+         TreeNode child = parentNode.Nodes.Add( @"Recipe: " + recipe.Name );
          child.Tag = recipe;
 
          if ( recipes.Count() > 1 )
@@ -139,7 +139,7 @@ namespace RePopCraftingStudio.UserControls
                menu.MenuItems.Add( new MenuItem( rec.Name, ( sender, args ) =>
                {
                   parentNode.Nodes.Clear();
-                  AddRecipeToNode( parentNode, recipes, rec );
+                  AddRecipeToNode( parentNode, recipes, rec, entityId );
                } ) );
                toolTipText += string.Format( "{0} - {1}\n", index++, rec.Name );
             }
@@ -150,13 +150,13 @@ namespace RePopCraftingStudio.UserControls
             child.ToolTipText = toolTipText;
          }
 
-         AddRecipeResults( child );
+         AddRecipeResults( child, entityId );
       }
 
-      private void AddRecipeResults( TreeNode recipeNode )
+      private void AddRecipeResults( TreeNode recipeNode, long resultId )
       {
          Recipe recipe = (Recipe)recipeNode.Tag;
-         IEnumerable<RecipeResult> recipeResults = Db.SelectRecipeResultsForRecipeAndResult( recipe.RecipeId, _rootEntity.Id );
+         IEnumerable<RecipeResult> recipeResults = Db.SelectRecipeResultsForRecipeAndResult( recipe.RecipeId, resultId );
          Debug.Assert( recipeResults.Any() );
 
          AddRecipeResultsToNode( recipeNode, recipeResults, recipeResults.First() );
@@ -171,14 +171,14 @@ namespace RePopCraftingStudio.UserControls
 
          if ( recipeResults.Count() > 1 )
          {
-            child.Text += @" - " + Db.GetIngredientSlotInfoForRecipeResults( recipeResult ).GetSpecificItemNames();
+            child.Text += @" - " + Db.GetIngredientSlotsInfoForRecipeResult( recipeResult ).GetSpecificItemNames();
 
             string toolTipText = "Potential Result Combos:\n\n";
             ContextMenu menu = new ContextMenu();
             int index = 1;
             foreach ( RecipeResult rec in recipeResults )
             {
-               IEnumerable<IngredientSlotInfo> infos = Db.GetIngredientSlotInfoForRecipeResults( rec );
+               IEnumerable<IngredientSlotInfo> infos = Db.GetIngredientSlotsInfoForRecipeResult( rec );
                menu.MenuItems.Add( new MenuItem( infos.GetSpecificItemNames(), ( sender, args ) =>
                {
                   parentNode.Nodes.Clear();
@@ -193,27 +193,58 @@ namespace RePopCraftingStudio.UserControls
             child.ToolTipText = toolTipText;
          }
 
-         AddRecipeResultIngredients(child, recipeResult);
+         AddRecipeResultIngredients( child );
+         AddRecipeResultAgents( child );
       }
 
-      private void AddRecipeResultIngredients(TreeNode parent, RecipeResult recipeResult)
+      private void AddRecipeResultIngredients( TreeNode parent )
       {
-         IEnumerable<IngredientSlotInfo> infos = Db.GetIngredientSlotInfoForRecipeResults( recipeResult );
-         foreach (IngredientSlotInfo info in infos)
+         RecipeResult recipeResult = (RecipeResult)parent.Tag;
+         IEnumerable<IngredientSlotInfo> infos = Db.GetIngredientSlotsInfoForRecipeResult( recipeResult );
+         foreach ( IngredientSlotInfo info in infos )
          {
-            TreeNode child = parent.Nodes.Add( @"i. " + info.DisplayName);
+            TreeNode child = parent.Nodes.Add( @"i. " + info.DisplayName );
             child.Tag = info;
 
             // this is where the fun begins ...
-            //if (info.IsSpecific)
-            //{
-            //   AddRecipes( child, info.Items.First().ItemId, EntityTypes.Item);
-            //}
+            if ( info.IsSpecific )
+            {
+               child.BackColor = Color.LightGreen;
+               AddRecipes( child, info.Items.First().ItemId, EntityTypes.Item );
+            }
+            else
+            {
+               child.BackColor = Color.LightPink;
+
+               // TEST CODE
+               //AddRecipes( child, info.Items.First().ItemId, EntityTypes.Item );
+            }
 
          }
          parent.ExpandAll();
       }
 
+      private void AddRecipeResultAgents( TreeNode parent )
+      {
+         RecipeResult recipeResult = (RecipeResult)parent.Tag;
+         IEnumerable<AgentSlotInfo> infos = Db.GetAgentSlotInfosForRecipeResult( recipeResult );
+         foreach ( AgentSlotInfo info in infos )
+         {
+            TreeNode child = parent.Nodes.Add( @"a. " + info.DisplayName );
+            child.Tag = info;
+
+            // this is where the fun begins ...
+            if ( info.IsSpecific )
+            {
+               child.BackColor = Color.LightGreen;
+               AddRecipes( child, info.Items.First().ItemId, EntityTypes.Item );
+            }
+            else
+            {
+               child.BackColor = Color.LightPink;
+            }
+         }
+      }
 
       internal class CraftableEntity
       {

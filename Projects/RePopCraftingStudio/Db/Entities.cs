@@ -246,15 +246,19 @@ namespace RePopCraftingStudio.Db
       }
    }
 
-   public class IngredientSlotInfo
+   public class AgentSlotInfo
    {
-      public int IngSlot { get; set; }
       public IEnumerable<Item> Items { get; set; }
       public CraftingComponent Component { get; set; }
 
       public bool IsSpecific { get { return 1 == Items.Count(); } }
       public string DisplayName { get { return IsSpecific ? Items.First().Name : Component.Name; } }
       public Entity Entity { get { return IsSpecific ? (Entity)Items.First() : Component; } }
+   }
+
+   public class IngredientSlotInfo : AgentSlotInfo
+   {
+      public int IngSlot { get; set; }
    }
 
    public static class IngredientSlotInfoExtensions
@@ -267,7 +271,7 @@ namespace RePopCraftingStudio.Db
             if ( info.IsSpecific )
                names += info.Items.First().Name + @", ";
          }
-         if (string.IsNullOrEmpty(names))
+         if ( string.IsNullOrEmpty( names ) )
             names = @"Nothing specific";
 
          return names;
