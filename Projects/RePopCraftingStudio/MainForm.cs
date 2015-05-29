@@ -53,9 +53,10 @@ namespace RePopCraftingStudio
          theManifestCreater.RootEntity = e.Entity;
       }
 
-      private void theManifestCreater_EntitySelected( object sender, UserControls.EntitySelectedEventArgs e )
+      private void theManifestCreater_ObjectSelected( object sender, UserControls.ObjectSelectedEventArgs e )
       {
-         SetDebugEntity( e.Entity );
+         thePropertyGrid.SelectedObject = e.Object;
+         //SetDebugEntity( e.Entity );
       }
 
       private void optionsToolStripMenuItem_Click( object sender, EventArgs e )

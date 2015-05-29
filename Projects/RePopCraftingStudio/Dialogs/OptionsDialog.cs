@@ -19,38 +19,70 @@ namespace RePopCraftingStudio.Dialogs
 
       private void OptionsDialog_Load( object sender, EventArgs e )
       {
-         Color prop1 = GetProperty( @"Ingredient-Gathered-Color", Color.Yellow );
-         Color prop2 = GetProperty( @"Ingredient-Gathered-Color", Color.Yellow );
-
-         //theColorDialog.ShowDialog(this);
+         recipeSingleChoicePanel.BackColor = (Color)Properties.Settings.Default[ @"RecipeSingleBackColor" ];
+         recipeMultipleChoicePanel.BackColor = (Color)Properties.Settings.Default[ @"RecipeMultipleBackColor" ];
+         ingredientGatheredPanel.BackColor = (Color)Properties.Settings.Default[ @"IngredientGatheredBackColor" ];
+         ingredientCraftedPanel.BackColor = (Color)Properties.Settings.Default[ @"IngredientCraftedBackColor" ];
+         agentGatheredPanel.BackColor = (Color)Properties.Settings.Default[ @"AgentGatheredBackColor" ];
+         agentCraftedPanel.BackColor = (Color)Properties.Settings.Default[ @"AgentCraftedBackColor" ];
+         agentComponentPanel.BackColor = (Color)Properties.Settings.Default[ @"AgentComponentBackColor" ];
       }
 
       private void OptionsDialog_FormClosing( object sender, FormClosingEventArgs e )
       {
          if ( DialogResult.OK != DialogResult )
             return;
+
+         Properties.Settings.Default[ @"RecipeSingleBackColor" ] = recipeSingleChoicePanel.BackColor;
+         Properties.Settings.Default[ @"RecipeMultipleBackColor" ] = recipeMultipleChoicePanel.BackColor;
+         Properties.Settings.Default[ @"IngredientGatheredBackColor" ] = ingredientGatheredPanel.BackColor;
+         Properties.Settings.Default[ @"IngredientCraftedBackColor" ] = ingredientCraftedPanel.BackColor;
+         Properties.Settings.Default[ @"AgentGatheredBackColor" ] = agentGatheredPanel.BackColor;
+         Properties.Settings.Default[ @"AgentCraftedBackColor" ] = agentCraftedPanel.BackColor;
+         Properties.Settings.Default[ @"AgentComponentBackColor" ] = agentComponentPanel.BackColor;
       }
 
-      private T GetProperty<T>( string name, T defaultValue )
+      private void recipeSingleChoiceButton_Click( object sender, EventArgs e )
       {
-         //
+         SelectColor( recipeSingleChoicePanel, @"RecipeSingleBackColor" );
+      }
 
-         SettingsProperty property = Properties.Settings.Default.Properties[ name ];
-         if ( null == property )
-         {
-            property = new SettingsProperty( name )
-               {
-                  PropertyType = typeof( T ),
-                  DefaultValue = defaultValue,
-                  IsReadOnly = false,
-                  Provider = Properties.Settings.Default.Providers["LocalFileSettingsProvider"],
-               };
-            property.Attributes.Add( typeof( UserScopedSettingAttribute ), new UserScopedSettingAttribute() );
-            Properties.Settings.Default.Properties.Add( property );
-            Properties.Settings.Default.Reload();
-         }
+      private void recipeMultipleChoiceButton_Click( object sender, EventArgs e )
+      {
+         SelectColor( recipeMultipleChoicePanel, @"RecipeMultipleBackColor" );
+      }
 
-         return (T) Properties.Settings.Default[name];
+      private void ingredientGatheredButton_Click( object sender, EventArgs e )
+      {
+         SelectColor( ingredientGatheredPanel, @"IngredientGatheredBackColor" );
+      }
+
+      private void ingredientCraftedButton_Click( object sender, EventArgs e )
+      {
+         SelectColor( ingredientCraftedPanel, @"IngredientCraftedBackColor" );
+      }
+
+      private void agentGatheredButton_Click( object sender, EventArgs e )
+      {
+         SelectColor( agentGatheredPanel, @"AgentGatheredBackColor" );
+      }
+
+      private void agentCraftedButton_Click( object sender, EventArgs e )
+      {
+         SelectColor( agentCraftedPanel, @"AgentCraftedBackColor" );
+      }
+
+      private void agentComponentButton_Click( object sender, EventArgs e )
+      {
+         SelectColor( agentComponentPanel, @"AgentComponentBackColor" );
+      }
+
+      private void SelectColor( Panel panel, string colorId )
+      {
+         theColorDialog.Color = panel.BackColor;
+         if ( DialogResult.OK != theColorDialog.ShowDialog( this ) )
+            return;
+         panel.BackColor = theColorDialog.Color;
       }
    }
 }

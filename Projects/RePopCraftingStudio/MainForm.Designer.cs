@@ -47,8 +47,8 @@ namespace RePopCraftingStudio
          this.manifestTreeView = new System.Windows.Forms.TreeView();
          this.manifestTextBox = new System.Windows.Forms.TextBox();
          this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-         this.toolStrip1 = new System.Windows.Forms.ToolStrip();
          this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+         this.toolStrip1 = new System.Windows.Forms.ToolStrip();
          this.mainSplitContainer.Panel1.SuspendLayout();
          this.mainSplitContainer.Panel2.SuspendLayout();
          this.mainSplitContainer.SuspendLayout();
@@ -167,7 +167,7 @@ namespace RePopCraftingStudio
          this.theManifestCreater.Name = "theManifestCreater";
          this.theManifestCreater.Size = new System.Drawing.Size(678, 693);
          this.theManifestCreater.TabIndex = 0;
-         this.theManifestCreater.EntitySelected += new System.EventHandler<RePopCraftingStudio.UserControls.EntitySelectedEventArgs>(this.theManifestCreater_EntitySelected);
+         this.theManifestCreater.ObjectSelected += new System.EventHandler<RePopCraftingStudio.UserControls.ObjectSelectedEventArgs>(this.theManifestCreater_ObjectSelected);
          // 
          // gameViewTabPage
          // 
@@ -283,6 +283,13 @@ namespace RePopCraftingStudio
          this.menuStrip1.TabIndex = 4;
          this.menuStrip1.Text = "menuStrip1";
          // 
+         // optionsToolStripMenuItem
+         // 
+         this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+         this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+         this.optionsToolStripMenuItem.Text = "&Options";
+         this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
+         // 
          // toolStrip1
          // 
          this.toolStrip1.Location = new System.Drawing.Point(0, 24);
@@ -290,13 +297,6 @@ namespace RePopCraftingStudio
          this.toolStrip1.Size = new System.Drawing.Size(1038, 25);
          this.toolStrip1.TabIndex = 5;
          this.toolStrip1.Text = "toolStrip1";
-         // 
-         // optionsToolStripMenuItem
-         // 
-         this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-         this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
-         this.optionsToolStripMenuItem.Text = "&Options";
-         this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
          // 
          // MainForm
          // 

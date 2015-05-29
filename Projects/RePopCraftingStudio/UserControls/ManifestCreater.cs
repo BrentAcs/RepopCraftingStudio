@@ -22,11 +22,20 @@ namespace RePopCraftingStudio.UserControls
          InitializeComponent();
       }
 
-      public event EventHandler<EntitySelectedEventArgs> EntitySelected;
+      //public event EventHandler<EntitySelectedEventArgs> EntitySelected;
 
-      protected virtual void OnEntitySelected( EntitySelectedEventArgs e )
+      //protected virtual void OnEntitySelected( EntitySelectedEventArgs e )
+      //{
+      //   EventHandler<EntitySelectedEventArgs> handler = EntitySelected;
+      //   if ( handler != null )
+      //      handler( this, e );
+      //}
+
+      public event EventHandler<ObjectSelectedEventArgs> ObjectSelected;
+
+      protected virtual void OnObjectSelected( ObjectSelectedEventArgs e )
       {
-         EventHandler<EntitySelectedEventArgs> handler = EntitySelected;
+         EventHandler<ObjectSelectedEventArgs> handler = ObjectSelected;
          if ( handler != null )
             handler( this, e );
       }
@@ -57,23 +66,25 @@ namespace RePopCraftingStudio.UserControls
 
       private void theTreeView_AfterSelect( object sender, TreeViewEventArgs e )
       {
-         if ( null == e.Node )
-         {
-            OnEntitySelected( new EntitySelectedEventArgs( null ) );
-         }
+         OnObjectSelected( new ObjectSelectedEventArgs( null == e.Node ? null : e.Node.Tag ) );
 
-         if ( e.Node.Tag is CraftableEntity )
-         {
-            OnEntitySelected( new EntitySelectedEventArgs( ( (CraftableEntity)e.Node.Tag ).Entity ) );
-         }
-         else if ( e.Node.Tag is IngredientSlotInfo )
-         {
-            OnEntitySelected( new EntitySelectedEventArgs( ( (IngredientSlotInfo)e.Node.Tag ).Entity ) );
-         }
-         else
-         {
-            OnEntitySelected( new EntitySelectedEventArgs( (Entity)e.Node.Tag ) );
-         }
+         //if ( null == e.Node )
+         //{
+         //   OnEntitySelected( new EntitySelectedEventArgs( null ) );
+         //}
+
+         //if ( e.Node.Tag is CraftableEntity )
+         //{
+         //   OnEntitySelected( new EntitySelectedEventArgs( ( (CraftableEntity)e.Node.Tag ).Entity ) );
+         //}
+         //else if ( e.Node.Tag is IngredientSlotInfo )
+         //{
+         //   OnEntitySelected( new EntitySelectedEventArgs( ( (IngredientSlotInfo)e.Node.Tag ).Entity ) );
+         //}
+         //else
+         //{
+         //   OnEntitySelected( new EntitySelectedEventArgs( (Entity)e.Node.Tag ) );
+         //}
       }
 
       private void theTreeView_AfterCheck( object sender, TreeViewEventArgs e )
@@ -148,11 +159,12 @@ namespace RePopCraftingStudio.UserControls
                toolTipText += string.Format( "{0} - {1}\n", index++, rec.Name );
             }
 
-            child.BackColor = Color.LightSkyBlue;
+            //child.BackColor = Color.LightSkyBlue;
 
             child.ContextMenu = menu;
             child.ToolTipText = toolTipText;
          }
+         ApplyTheme( parentNode );
 
          AddRecipeResults( child, entityId );
       }
@@ -192,7 +204,7 @@ namespace RePopCraftingStudio.UserControls
                toolTipText += string.Format( "{0} - {1}\n", index++, infos.GetSpecificItemNames() );
             }
 
-            child.BackColor = Color.LightSkyBlue;
+            //child.BackColor = Color.LightSkyBlue;
 
             child.ContextMenu = menu;
             child.ToolTipText = toolTipText;
@@ -200,6 +212,7 @@ namespace RePopCraftingStudio.UserControls
 
          AddRecipeResultIngredients( child );
          AddRecipeResultAgents( child );
+         ApplyTheme( parentNode );
          BuildManifest();
       }
 
@@ -215,12 +228,12 @@ namespace RePopCraftingStudio.UserControls
             // this is where the fun begins ...
             if ( info.IsSpecific )
             {
-               child.BackColor = Color.ForestGreen;
+               //child.BackColor = Color.ForestGreen;
                AddRecipes( child, info.Items.First().ItemId, EntityTypes.Item );
 
                // indicate a terminal item.
-               if ( 0 == child.Nodes.Count )
-                  child.BackColor = Color.LightGreen;
+               //if ( 0 == child.Nodes.Count )
+               //   child.BackColor = Color.LightGreen;
             }
             else
             {
@@ -240,11 +253,14 @@ namespace RePopCraftingStudio.UserControls
                //}
 
 
-               child.BackColor = Color.LightPink;
+               //child.BackColor = Color.LightPink;
                child.ContextMenu = menu;
                child.ToolTipText = toolTipText;
             }
+
+            ApplyTheme( child );
          }
+         ApplyTheme( parent );
          parent.ExpandAll();
       }
 
@@ -260,19 +276,58 @@ namespace RePopCraftingStudio.UserControls
             // this is where the fun begins ...
             if ( info.IsSpecific )
             {
-               child.BackColor = Color.ForestGreen;
+               //child.BackColor = Color.ForestGreen;
                AddRecipes( child, info.Items.First().ItemId, EntityTypes.Item );
 
-               if ( 0 == child.Nodes.Count )
-                  child.BackColor = Color.LightGreen;
+               //if ( 0 == child.Nodes.Count )
+               //   child.BackColor = Color.LightGreen;
             }
             else
             {
-               child.BackColor = Color.LightPink;
+               //child.BackColor = Color.LightPink;
             }
+
+            ApplyTheme( child );
          }
+
+         ApplyTheme( parent );
       }
 
+
+      private void ApplyTheme( TreeNode node )
+      {
+         var tag = node.Tag;
+         if ( node.Tag is CraftableEntity )
+         {
+            node.BackColor = Properties.Settings.Default.IngredientCraftedBackColor;
+         }
+         else if ( node.Tag is IngredientSlotInfo )
+         {
+            node.BackColor = 0 == node.Nodes.Count 
+               ? Properties.Settings.Default.IngredientGatheredBackColor
+               : Properties.Settings.Default.IngredientCraftedBackColor;
+         }
+         else if (node.Tag is AgentSlotInfo)
+         {
+            node.BackColor = Properties.Settings.Default.AgentComponentBackColor;
+         }
+         else if (node.Tag is Recipe)
+         {
+            node.BackColor = null == node.ContextMenu
+               ? Properties.Settings.Default.RecipeSingleBackColor
+               : Properties.Settings.Default.RecipeMultipleBackColor;
+         }
+         else if ( node.Tag is RecipeResult )
+         {
+            //node.BackColor = null == node.ContextMenu
+            //   ? Properties.Settings.Default.RecipeSingleBackColor
+            //   : Properties.Settings.Default.RecipeMultipleBackColor;
+         }
+         else
+         {
+
+         }
+      }
 
       // ================================================================================
       private int buildCounter = 1;

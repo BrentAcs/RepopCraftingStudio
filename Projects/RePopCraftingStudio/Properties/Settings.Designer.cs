@@ -166,5 +166,89 @@ namespace RePopCraftingStudio.Properties {
                 this["LastSelectionTabIndex"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("192, 255, 255")]
+        public global::System.Drawing.Color RecipeSingleBackColor {
+            get {
+                return ((global::System.Drawing.Color)(this["RecipeSingleBackColor"]));
+            }
+            set {
+                this["RecipeSingleBackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Cyan")]
+        public global::System.Drawing.Color RecipeMultipleBackColor {
+            get {
+                return ((global::System.Drawing.Color)(this["RecipeMultipleBackColor"]));
+            }
+            set {
+                this["RecipeMultipleBackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("192, 255, 192")]
+        public global::System.Drawing.Color IngredientGatheredBackColor {
+            get {
+                return ((global::System.Drawing.Color)(this["IngredientGatheredBackColor"]));
+            }
+            set {
+                this["IngredientGatheredBackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Lime")]
+        public global::System.Drawing.Color IngredientCraftedBackColor {
+            get {
+                return ((global::System.Drawing.Color)(this["IngredientCraftedBackColor"]));
+            }
+            set {
+                this["IngredientCraftedBackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("255, 255, 192")]
+        public global::System.Drawing.Color AgentGatheredBackColor {
+            get {
+                return ((global::System.Drawing.Color)(this["AgentGatheredBackColor"]));
+            }
+            set {
+                this["AgentGatheredBackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Yellow")]
+        public global::System.Drawing.Color AgentCraftedBackColor {
+            get {
+                return ((global::System.Drawing.Color)(this["AgentCraftedBackColor"]));
+            }
+            set {
+                this["AgentCraftedBackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("255, 128, 128")]
+        public global::System.Drawing.Color AgentComponentBackColor {
+            get {
+                return ((global::System.Drawing.Color)(this["AgentComponentBackColor"]));
+            }
+            set {
+                this["AgentComponentBackColor"] = value;
+            }
+        }
     }
 }

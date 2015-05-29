@@ -38,5 +38,26 @@
     <Setting Name="LastSelectionTabIndex" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="RecipeSingleBackColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">192, 255, 255</Value>
+    </Setting>
+    <Setting Name="RecipeMultipleBackColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Cyan</Value>
+    </Setting>
+    <Setting Name="IngredientGatheredBackColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">192, 255, 192</Value>
+    </Setting>
+    <Setting Name="IngredientCraftedBackColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Lime</Value>
+    </Setting>
+    <Setting Name="AgentGatheredBackColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">255, 255, 192</Value>
+    </Setting>
+    <Setting Name="AgentCraftedBackColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Yellow</Value>
+    </Setting>
+    <Setting Name="AgentComponentBackColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">255, 128, 128</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
