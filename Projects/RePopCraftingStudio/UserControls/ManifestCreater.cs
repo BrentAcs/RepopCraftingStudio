@@ -278,26 +278,20 @@ namespace RePopCraftingStudio.UserControls
       private int buildCounter = 1;
       private void BuildManifest()
       {
-         manifestTextBox.Text = string.Format( "Manifest build # {0} for {1}\r\n", buildCounter++, theTreeView.Nodes[ 0 ].Text );
+         theListView.Items.Clear();
 
-         //List<object> stuffs = new List<object>();
          ManifestBuilder manifest = new ManifestBuilder();
          GetNodeTags( theTreeView.Nodes[ 0 ], manifest );
 
-         StringBuilder builder = new StringBuilder();
-         builder.AppendLine( "Items:" );
          foreach ( KeyValuePair<long, int> pair in manifest.Items )
          {
-            builder.AppendFormat( "{0}: {1}\r\n", Db.GetItemName( pair.Key ), pair.Value );
+            theListView.Items.Add( Db.GetItemName( pair.Key ) ).SubItems.Add( pair.Value.ToString() );
          }
 
-         builder.AppendLine( "\r\nComponents:" );
          foreach ( KeyValuePair<long, int> pair in manifest.Components )
          {
-            builder.AppendFormat( "{0}: {1}\r\n", Db.SelectCraftingComponentById( pair.Key ).Name, pair.Value );
+            theListView.Items.Add( Db.SelectCraftingComponentById( pair.Key ).Name ).SubItems.Add( pair.Value.ToString() );
          }
-
-         manifestTextBox.Text += builder.ToString();
       }
 
       private void GetNodeTags( TreeNode parent, ManifestBuilder builder )
