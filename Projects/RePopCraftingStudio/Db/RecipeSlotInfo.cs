@@ -5,12 +5,22 @@ namespace RePopCraftingStudio.Db
 {
    public abstract class RecipeSlotInfo
    {
+      private Item _specificItem;
+
       public IEnumerable<Item> Items { get; set; }
       public CraftingComponent Component { get; set; }
 
-      public bool IsSpecific { get { return 1 == Items.Count(); } }
-      public string DisplayName { get { return IsSpecific ? Items.First().Name : Component.Name; } }
-      public Entity Entity { get { return IsSpecific ? (Entity)Items.First() : Component; } }
+      public Item SpecificItem
+      {
+         get { return _specificItem ?? Items.First(); }
+         set { _specificItem = value; }
+      }
+
+      public bool IsSpecific { get { return ( null != _specificItem ) || ( 1 == Items.Count() ); } }
+
+      public string DisplayName { get { return IsSpecific ? SpecificItem.Name : Component.Name; } }
+
+      public Entity Entity { get { return IsSpecific ? (Entity)SpecificItem : Component; } }
    }
 
    public class AgentSlotInfo : RecipeSlotInfo

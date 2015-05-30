@@ -131,7 +131,6 @@ namespace RePopCraftingStudio.UserControls
       private void AddRecipes( TreeNode entityNode, long entityId, EntityTypes entityType )
       {
          IEnumerable<Recipe> recipes = Db.SelectRecipesByResultIdandType( entityId, entityType );
-         //Debug.Assert( recipes.Any() );
          if ( !recipes.Any() )
             return;
 
@@ -159,8 +158,6 @@ namespace RePopCraftingStudio.UserControls
                toolTipText += string.Format( "{0} - {1}\n", index++, rec.Name );
             }
 
-            //child.BackColor = Color.LightSkyBlue;
-
             child.ContextMenu = menu;
             child.ToolTipText = toolTipText;
          }
@@ -182,12 +179,9 @@ namespace RePopCraftingStudio.UserControls
 
       private void AddRecipeResultsToNode( TreeNode parentNode, IEnumerable<RecipeResult> recipeResults, RecipeResult recipeResult )
       {
-         TreeNode child = parentNode.Nodes.Add( @"Result" );
-         child.Tag = recipeResult;
-
          if ( recipeResults.Count() > 1 )
          {
-            child.Text += @" - " + Db.GetIngredientSlotsInfoForRecipeResult( recipeResult ).GetSpecificItemNames();
+            parentNode.Text += @" - " + Db.GetIngredientSlotsInfoForRecipeResult( recipeResult ).GetSpecificItemNames();
 
             string toolTipText = "Potential Result Combos:\n\n";
             ContextMenu menu = new ContextMenu();
@@ -204,56 +198,47 @@ namespace RePopCraftingStudio.UserControls
                toolTipText += string.Format( "{0} - {1}\n", index++, infos.GetSpecificItemNames() );
             }
 
-            //child.BackColor = Color.LightSkyBlue;
-
-            child.ContextMenu = menu;
-            child.ToolTipText = toolTipText;
+            parentNode.ContextMenu = menu;
+            parentNode.ToolTipText = toolTipText;
          }
 
-         AddRecipeResultIngredients( child );
-         AddRecipeResultAgents( child );
+         AddRecipeResultIngredients( parentNode, recipeResult );
+         AddRecipeResultAgents( parentNode, recipeResult );
          ApplyTheme( parentNode );
          BuildManifest();
       }
 
-      private void AddRecipeResultIngredients( TreeNode parent )
+      private void AddRecipeResultIngredients( TreeNode parent, RecipeResult recipeResult )
       {
-         RecipeResult recipeResult = (RecipeResult)parent.Tag;
          IEnumerable<IngredientSlotInfo> infos = Db.GetIngredientSlotsInfoForRecipeResult( recipeResult );
          foreach ( IngredientSlotInfo info in infos )
          {
             TreeNode child = parent.Nodes.Add( @"i. " + info.DisplayName );
             child.Tag = info;
 
-            // this is where the fun begins ...
             if ( info.IsSpecific )
             {
-               //child.BackColor = Color.ForestGreen;
                AddRecipes( child, info.Items.First().ItemId, EntityTypes.Item );
-
-               // indicate a terminal item.
-               //if ( 0 == child.Nodes.Count )
-               //   child.BackColor = Color.LightGreen;
             }
             else
             {
                string toolTipText = "you are tired, and you left off here.:\n\n";
                ContextMenu menu = new ContextMenu();
                int index = 1;
-               //foreach ( RecipeResult rec in recipeResults )
-               //{
-               //   IEnumerable<IngredientSlotInfo> infos = Db.GetIngredientSlotsInfoForRecipeResult( rec );
-               //   menu.MenuItems.Add( new MenuItem( infos.GetSpecificItemNames(), ( sender, args ) =>
-               //   {
-               //      parentNode.Nodes.Clear();
-               //      AddRecipeResultsToNode( parentNode, recipeResults, rec );
-               //      parentNode.ExpandAll();
-               //   } ) );
-               //   toolTipText += string.Format( "{0} - {1}\n", index++, infos.GetSpecificItemNames() );
-               //}
+               foreach ( Item item in info.Items )
+               {
+                  menu.MenuItems.Add( item.Name, ( sender, args ) =>
+                  {
+                     info.SpecificItem = item;
+                     child.Text = @"a. " + item.Name;
+                     AddRecipes( child, item.ItemId, EntityTypes.Item );
+                     child.ExpandAll();
+                     BuildManifest();
+                     ApplyTheme( child );
+                  } );
+                  toolTipText += string.Format( "{0} - {1}\n", index++, item.Name );
+               }
 
-
-               //child.BackColor = Color.LightPink;
                child.ContextMenu = menu;
                child.ToolTipText = toolTipText;
             }
@@ -264,27 +249,39 @@ namespace RePopCraftingStudio.UserControls
          parent.ExpandAll();
       }
 
-      private void AddRecipeResultAgents( TreeNode parent )
+      private void AddRecipeResultAgents( TreeNode parent, RecipeResult recipeResult )
       {
-         RecipeResult recipeResult = (RecipeResult)parent.Tag;
          IEnumerable<AgentSlotInfo> infos = Db.GetAgentSlotInfosForRecipeResult( recipeResult );
          foreach ( AgentSlotInfo info in infos )
          {
             TreeNode child = parent.Nodes.Add( @"a. " + info.DisplayName );
             child.Tag = info;
 
-            // this is where the fun begins ...
             if ( info.IsSpecific )
             {
-               //child.BackColor = Color.ForestGreen;
                AddRecipes( child, info.Items.First().ItemId, EntityTypes.Item );
-
-               //if ( 0 == child.Nodes.Count )
-               //   child.BackColor = Color.LightGreen;
             }
             else
             {
-               //child.BackColor = Color.LightPink;
+               string toolTipText = "Select individual agent:\n\n";
+               ContextMenu menu = new ContextMenu();
+               int index = 1;
+               foreach ( Item item in info.Items )
+               {
+                  menu.MenuItems.Add( item.Name, ( sender, args ) =>
+                     {
+                        info.SpecificItem = item;
+                        child.Text = @"a. " + item.Name;
+                        AddRecipes( child, item.ItemId, EntityTypes.Item );
+                        child.ExpandAll();
+                        BuildManifest();
+                        ApplyTheme( child );
+                     } );
+                  toolTipText += string.Format( "{0} - {1}\n", index++, item.Name );
+               }
+
+               child.ContextMenu = menu;
+               child.ToolTipText = toolTipText;
             }
 
             ApplyTheme( child );
@@ -303,25 +300,21 @@ namespace RePopCraftingStudio.UserControls
          }
          else if ( node.Tag is IngredientSlotInfo )
          {
-            node.BackColor = 0 == node.Nodes.Count 
+            node.BackColor = ( node.Tag as IngredientSlotInfo ).IsSpecific
                ? Properties.Settings.Default.IngredientGatheredBackColor
                : Properties.Settings.Default.IngredientCraftedBackColor;
          }
-         else if (node.Tag is AgentSlotInfo)
+         else if ( node.Tag is AgentSlotInfo )
          {
-            node.BackColor = Properties.Settings.Default.AgentComponentBackColor;
+            node.BackColor = ( node.Tag as AgentSlotInfo ).IsSpecific
+               ? Properties.Settings.Default.IngredientCraftedBackColor
+               : Properties.Settings.Default.AgentComponentBackColor;
          }
-         else if (node.Tag is Recipe)
+         else if ( node.Tag is Recipe )
          {
             node.BackColor = null == node.ContextMenu
                ? Properties.Settings.Default.RecipeSingleBackColor
                : Properties.Settings.Default.RecipeMultipleBackColor;
-         }
-         else if ( node.Tag is RecipeResult )
-         {
-            //node.BackColor = null == node.ContextMenu
-            //   ? Properties.Settings.Default.RecipeSingleBackColor
-            //   : Properties.Settings.Default.RecipeMultipleBackColor;
          }
          else
          {

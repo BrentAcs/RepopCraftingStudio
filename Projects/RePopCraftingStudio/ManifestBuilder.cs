@@ -21,9 +21,9 @@ namespace RePopCraftingStudio
          SlotCount++;
          if ( info.IsSpecific )
          {
-            if ( !Items.ContainsKey( info.Items.First().ItemId ) )
-               Items[ info.Items.First().ItemId ] = 0;
-            Items[ info.Items.First().ItemId ]++;
+            if ( !Items.ContainsKey( info.SpecificItem.ItemId ) )
+               Items[ info.SpecificItem.ItemId ] = 0;
+            Items[ info.SpecificItem.ItemId ]++;
          }
          else
          {
