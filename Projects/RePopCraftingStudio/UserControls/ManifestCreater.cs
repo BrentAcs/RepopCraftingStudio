@@ -67,24 +67,6 @@ namespace RePopCraftingStudio.UserControls
       private void theTreeView_AfterSelect( object sender, TreeViewEventArgs e )
       {
          OnObjectSelected( new ObjectSelectedEventArgs( null == e.Node ? null : e.Node.Tag ) );
-
-         //if ( null == e.Node )
-         //{
-         //   OnEntitySelected( new EntitySelectedEventArgs( null ) );
-         //}
-
-         //if ( e.Node.Tag is CraftableEntity )
-         //{
-         //   OnEntitySelected( new EntitySelectedEventArgs( ( (CraftableEntity)e.Node.Tag ).Entity ) );
-         //}
-         //else if ( e.Node.Tag is IngredientSlotInfo )
-         //{
-         //   OnEntitySelected( new EntitySelectedEventArgs( ( (IngredientSlotInfo)e.Node.Tag ).Entity ) );
-         //}
-         //else
-         //{
-         //   OnEntitySelected( new EntitySelectedEventArgs( (Entity)e.Node.Tag ) );
-         //}
       }
 
       private void theTreeView_AfterCheck( object sender, TreeViewEventArgs e )
@@ -161,7 +143,7 @@ namespace RePopCraftingStudio.UserControls
             child.ContextMenu = menu;
             child.ToolTipText = toolTipText;
          }
-         ApplyTheme( parentNode );
+         ManifestTreeNodeThemes.Apply( parentNode );
 
          AddRecipeResults( child, entityId );
       }
@@ -204,7 +186,7 @@ namespace RePopCraftingStudio.UserControls
 
          AddRecipeResultIngredients( parentNode, recipeResult );
          AddRecipeResultAgents( parentNode, recipeResult );
-         ApplyTheme( parentNode );
+         ManifestTreeNodeThemes.Apply( parentNode );
          BuildManifest();
       }
 
@@ -231,10 +213,11 @@ namespace RePopCraftingStudio.UserControls
                   {
                      info.SpecificItem = item;
                      child.Text = @"a. " + item.Name;
+                     child.Nodes.Clear();
                      AddRecipes( child, item.ItemId, EntityTypes.Item );
                      child.ExpandAll();
                      BuildManifest();
-                     ApplyTheme( child );
+                     ManifestTreeNodeThemes.Apply( child );
                   } );
                   toolTipText += string.Format( "{0} - {1}\n", index++, item.Name );
                }
@@ -243,9 +226,9 @@ namespace RePopCraftingStudio.UserControls
                child.ToolTipText = toolTipText;
             }
 
-            ApplyTheme( child );
+            ManifestTreeNodeThemes.Apply( child );
          }
-         ApplyTheme( parent );
+         ManifestTreeNodeThemes.Apply( parent );
          parent.ExpandAll();
       }
 
@@ -272,10 +255,11 @@ namespace RePopCraftingStudio.UserControls
                      {
                         info.SpecificItem = item;
                         child.Text = @"a. " + item.Name;
+                        child.Nodes.Clear();
                         AddRecipes( child, item.ItemId, EntityTypes.Item );
                         child.ExpandAll();
                         BuildManifest();
-                        ApplyTheme( child );
+                        ManifestTreeNodeThemes.Apply( child );
                      } );
                   toolTipText += string.Format( "{0} - {1}\n", index++, item.Name );
                }
@@ -284,42 +268,10 @@ namespace RePopCraftingStudio.UserControls
                child.ToolTipText = toolTipText;
             }
 
-            ApplyTheme( child );
+            ManifestTreeNodeThemes.Apply( child );
          }
 
-         ApplyTheme( parent );
-      }
-
-
-      private void ApplyTheme( TreeNode node )
-      {
-         var tag = node.Tag;
-         if ( node.Tag is CraftableEntity )
-         {
-            node.BackColor = Properties.Settings.Default.IngredientCraftedBackColor;
-         }
-         else if ( node.Tag is IngredientSlotInfo )
-         {
-            node.BackColor = ( node.Tag as IngredientSlotInfo ).IsSpecific
-               ? Properties.Settings.Default.IngredientGatheredBackColor
-               : Properties.Settings.Default.IngredientCraftedBackColor;
-         }
-         else if ( node.Tag is AgentSlotInfo )
-         {
-            node.BackColor = ( node.Tag as AgentSlotInfo ).IsSpecific
-               ? Properties.Settings.Default.IngredientCraftedBackColor
-               : Properties.Settings.Default.AgentComponentBackColor;
-         }
-         else if ( node.Tag is Recipe )
-         {
-            node.BackColor = null == node.ContextMenu
-               ? Properties.Settings.Default.RecipeSingleBackColor
-               : Properties.Settings.Default.RecipeMultipleBackColor;
-         }
-         else
-         {
-
-         }
+         ManifestTreeNodeThemes.Apply( parent );
       }
 
       // ================================================================================
@@ -359,6 +311,43 @@ namespace RePopCraftingStudio.UserControls
          {
             RecipeSlotInfo info = parent.Tag as RecipeSlotInfo;
             builder.AddSlotInfo( info );
+         }
+      }
+
+      protected class ManifestTreeNodeThemes
+      {
+         protected delegate void ApplyProc( TreeNode node );
+
+         protected static IDictionary<Type, ApplyProc> ThemeApplications = new Dictionary<Type, ApplyProc>
+            {
+               { typeof(CraftableEntity),
+                  node => node.BackColor = Properties.Settings.Default.IngredientCraftedBackColor },
+
+               { typeof(IngredientSlotInfo),
+                  node => node.BackColor = ( node.Tag as IngredientSlotInfo ).IsSpecific
+                     ? Properties.Settings.Default.IngredientGatheredBackColor
+                     : Properties.Settings.Default.IngredientCraftedBackColor},
+
+               { typeof(AgentSlotInfo),
+                  node => node.BackColor = ( node.Tag as AgentSlotInfo ).IsSpecific
+                  ? Properties.Settings.Default.IngredientCraftedBackColor
+                  : Properties.Settings.Default.AgentComponentBackColor },
+
+               { typeof(Recipe),
+                 node => node.BackColor = null == node.ContextMenu
+                  ? Properties.Settings.Default.RecipeSingleBackColor
+                  : Properties.Settings.Default.RecipeMultipleBackColor },
+            };
+
+         public static void Apply( TreeNode node )
+         {
+            if ( null == node || null == node.Tag )
+               return;
+
+            if ( !ThemeApplications.ContainsKey( node.Tag.GetType() ) )
+               throw new InvalidOperationException( @"Unable to find node theme application strategy." );
+
+            ThemeApplications[ node.Tag.GetType() ]( node );
          }
       }
 
