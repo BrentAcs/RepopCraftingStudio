@@ -164,6 +164,14 @@ namespace RePopCraftingStudio.Db
             r => new RecipeResult( this, r.ItemArray ) );
       }
 
+      // "Skills" table access
+      public string GetSkillName( long skillId )
+      {
+         if ( 0 == skillId )
+            return string.Empty;
+         return (string)GetDataRow( @"select displayName from skills where skillId = {0}", skillId ).ItemArray[ 0 ];
+      }
+
       // "Structures" table access
       public IEnumerable<Blueprint> SelectBlueprintsByName( string filter )
       {
@@ -223,13 +231,6 @@ namespace RePopCraftingStudio.Db
       //      return string.Empty;
       //   return
       //      (string)GetDataRow( @"select displayName from crafting_filters where filterId = {0}", filterId ).ItemArray[ 0 ];
-      //}
-
-      //public string GetSkillName( long skillId )
-      //{
-      //   if ( 0 == skillId )
-      //      return string.Empty;
-      //   return (string)GetDataRow( @"select displayName from skills where skillId = {0}", skillId ).ItemArray[ 0 ];
       //}
 
       //public Item SelectItemById( long itemId )

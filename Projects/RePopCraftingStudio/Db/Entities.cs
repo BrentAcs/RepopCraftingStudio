@@ -142,8 +142,7 @@ namespace RePopCraftingStudio.Db
       public string Name { get { return (string)Items[ 1 ]; } }
       public string Description { get { return (string)Items[ 2 ]; } }
       public long SkillId { get { return (long)Items[ 3 ]; } }
-      //public string SkillName { get { return Db.GetSkillName( SkillId ); } }
-      public string SkillName { get { return @"TODO: Fix SkillName getter"; } }
+      public string SkillName { get { return Db.GetSkillName( SkillId ); } }
       public long Steps { get { return (long)Items[ 4 ]; } }
       public long IngredientWeight { get { return (long)Items[ 5 ]; } }
       public long AgentWeight { get { return (long)Items[ 6 ]; } }

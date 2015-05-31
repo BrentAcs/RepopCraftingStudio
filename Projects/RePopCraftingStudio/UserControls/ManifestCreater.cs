@@ -43,6 +43,13 @@ namespace RePopCraftingStudio.UserControls
       public override void LoadSettings()
       {
          manifestSplitContainer.SplitterDistance = Properties.Settings.Default.ManifestViewSplitterDistance;
+         recipeSinglePanel.BackColor = Properties.Settings.Default.RecipeSingleBackColor;
+         agentGatheredPanel.BackColor = Properties.Settings.Default.AgentGatheredBackColor;
+         ingredientGatheredPanel.BackColor = Properties.Settings.Default.IngredientGatheredBackColor;
+         recipeMultiplePnel.BackColor = Properties.Settings.Default.RecipeMultipleBackColor;
+         agentCraftedPanel.BackColor = Properties.Settings.Default.AgentCraftedBackColor;
+         ingredientCraftedPanel.BackColor = Properties.Settings.Default.IngredientCraftedBackColor;
+         agentComponentPanel.BackColor = Properties.Settings.Default.AgentComponentBackColor;
 
          base.LoadSettings();
       }
@@ -121,7 +128,7 @@ namespace RePopCraftingStudio.UserControls
 
       private void AddRecipeToNode( TreeNode parentNode, IEnumerable<Recipe> recipes, Recipe recipe, long entityId )
       {
-         TreeNode child = parentNode.Nodes.Add( @"Recipe: " + recipe.Name );
+         TreeNode child = parentNode.Nodes.Add( string.Format( @"R: {0} ({1})", recipe.Name, recipe.SkillName ) );
          child.Tag = recipe;
 
          if ( recipes.Count() > 1 )
@@ -285,12 +292,16 @@ namespace RePopCraftingStudio.UserControls
 
          foreach ( KeyValuePair<long, int> pair in manifest.Items )
          {
-            theListView.Items.Add( Db.GetItemName( pair.Key ) ).SubItems.Add( pair.Value.ToString() );
+            ListViewItem item = theListView.Items.Add( Db.GetItemName( pair.Key ) );
+            item.SubItems.Add( pair.Value.ToString() );
+
          }
 
          foreach ( KeyValuePair<long, int> pair in manifest.Components )
          {
-            theListView.Items.Add( Db.SelectCraftingComponentById( pair.Key ).Name ).SubItems.Add( pair.Value.ToString() );
+            ListViewItem item = theListView.Items.Add( Db.SelectCraftingComponentById( pair.Key ).Name );
+            item.SubItems.Add( pair.Value.ToString() );
+            item.BackColor = Color.LightPink;
          }
       }
 
@@ -362,6 +373,21 @@ namespace RePopCraftingStudio.UserControls
          public EntityTypes EntityType
          {
             get { return IsItem ? EntityTypes.Item : IsFitting ? EntityTypes.Fitting : EntityTypes.Blueprint; }
+         }
+      }
+
+      private void legendToggleButton_Click( object sender, EventArgs e )
+      {
+         // cheap toggle check
+         if ( @"Hide" == legendToggleButton.Text )
+         {
+            legendToggleButton.Text = @"Show";
+            legendPanel.Height = 27;
+         }
+         else
+         {
+            legendToggleButton.Text = @"Hide";
+            legendPanel.Height = 138;
          }
       }
    }
