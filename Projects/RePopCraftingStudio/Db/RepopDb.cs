@@ -160,7 +160,8 @@ namespace RePopCraftingStudio.Db
       {
          return RowsToEntities(
             GetDataRows(
-               @"select * from recipe_results where level=1 and resultId={0} and recipeId={1}", resultId, recipeId ),
+               @"select * from recipe_results where resultId={0} and recipeId={1}", resultId, recipeId ),
+               //@"select * from recipe_results where level=1 and resultId={0} and recipeId={1}", resultId, recipeId ),
             r => new RecipeResult( this, r.ItemArray ) );
       }
 

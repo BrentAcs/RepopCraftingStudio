@@ -61,7 +61,7 @@ namespace RePopCraftingStudio.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("128")]
+        [global::System.Configuration.DefaultSettingValueAttribute("320")]
         public int LeftSplitterDistance {
             get {
                 return ((int)(this["LeftSplitterDistance"]));
@@ -145,7 +145,7 @@ namespace RePopCraftingStudio.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("128")]
+        [global::System.Configuration.DefaultSettingValueAttribute("420")]
         public int ManifestViewSplitterDistance {
             get {
                 return ((int)(this["ManifestViewSplitterDistance"]));

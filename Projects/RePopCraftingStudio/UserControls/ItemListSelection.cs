@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Data;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace RePopCraftingStudio.UserControls
       {
          get
          {
-            if (null == _selecters)
+            if ( null == _selecters )
             {
                _selecters = new Dictionary<int, SelectEntitiesByNameProc>
                   {

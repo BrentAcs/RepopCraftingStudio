@@ -107,7 +107,10 @@ namespace RePopCraftingStudio.UserControls
 
             AddRecipes( root, _rootEntity.Id, _rootEntity.EntityType );
 
-            root.ExpandAll();
+            root.Expand();
+            if ( root.Nodes.Count > 0 )
+               root.Nodes[ 0 ].Expand();
+
             BuildManifest();
          }
          finally
@@ -142,7 +145,7 @@ namespace RePopCraftingStudio.UserControls
                {
                   parentNode.Nodes.Clear();
                   AddRecipeToNode( parentNode, recipes, rec, entityId );
-                  parentNode.ExpandAll();
+                  //parentNode.ExpandAll();
                } ) );
                toolTipText += string.Format( "{0} - {1}\n", index++, rec.Name );
             }
@@ -159,11 +162,16 @@ namespace RePopCraftingStudio.UserControls
       {
          Recipe recipe = (Recipe)recipeNode.Tag;
          IEnumerable<RecipeResult> recipeResults = Db.SelectRecipeResultsForRecipeAndResult( recipe.RecipeId, resultId );
-         Debug.Assert( recipeResults.Any() );
+
+         if ( !recipeResults.Any() )
+         {
+            MessageBox.Show( "DB failed to return results. Possible issue.", "Diagnostics", MessageBoxButtons.OK );
+            return;
+         }
 
          AddRecipeResultsToNode( recipeNode, recipeResults, recipeResults.First() );
 
-         recipeNode.ExpandAll();
+         //recipeNode.ExpandAll();
       }
 
       private void AddRecipeResultsToNode( TreeNode parentNode, IEnumerable<RecipeResult> recipeResults, RecipeResult recipeResult )
@@ -182,7 +190,7 @@ namespace RePopCraftingStudio.UserControls
                {
                   parentNode.Nodes.Clear();
                   AddRecipeResultsToNode( parentNode, recipeResults, rec );
-                  parentNode.ExpandAll();
+                  //parentNode.ExpandAll();
                } ) );
                toolTipText += string.Format( "{0} - {1}\n", index++, infos.GetSpecificItemNames() );
             }
@@ -222,7 +230,7 @@ namespace RePopCraftingStudio.UserControls
                      child.Text = @"a. " + item.Name;
                      child.Nodes.Clear();
                      AddRecipes( child, item.ItemId, EntityTypes.Item );
-                     child.ExpandAll();
+                     //child.ExpandAll();
                      BuildManifest();
                      ManifestTreeNodeThemes.Apply( child );
                   } );
@@ -236,7 +244,7 @@ namespace RePopCraftingStudio.UserControls
             ManifestTreeNodeThemes.Apply( child );
          }
          ManifestTreeNodeThemes.Apply( parent );
-         parent.ExpandAll();
+         //parent.ExpandAll();
       }
 
       private void AddRecipeResultAgents( TreeNode parent, RecipeResult recipeResult )
@@ -264,7 +272,7 @@ namespace RePopCraftingStudio.UserControls
                         child.Text = @"a. " + item.Name;
                         child.Nodes.Clear();
                         AddRecipes( child, item.ItemId, EntityTypes.Item );
-                        child.ExpandAll();
+                        //child.ExpandAll();
                         BuildManifest();
                         ManifestTreeNodeThemes.Apply( child );
                      } );
@@ -283,6 +291,14 @@ namespace RePopCraftingStudio.UserControls
 
       // ================================================================================
       private int buildCounter = 1;
+
+      // TODO: move out of class?
+      public class ManifestItem
+      {
+         public string Item { get; set; }
+         public int Count { get; set; }
+      }
+
       private void BuildManifest()
       {
          theListView.Items.Clear();
@@ -290,18 +306,29 @@ namespace RePopCraftingStudio.UserControls
          ManifestBuilder manifest = new ManifestBuilder();
          GetNodeTags( theTreeView.Nodes[ 0 ], manifest );
 
+         IList<ManifestItem> items = new List<ManifestItem>();
          foreach ( KeyValuePair<long, int> pair in manifest.Items )
          {
-            ListViewItem item = theListView.Items.Add( Db.GetItemName( pair.Key ) );
-            item.SubItems.Add( pair.Value.ToString() );
-
+            items.Add( new ManifestItem { Item = Db.GetItemName( pair.Key ), Count = pair.Value, } );
          }
 
+         foreach ( ManifestItem item in items.OrderBy( i => i.Item ) )
+         {
+            ListViewItem viewItem = theListView.Items.Add( item.Item );
+            viewItem.SubItems.Add( item.Count.ToString() );
+         }
+
+         items.Clear();
          foreach ( KeyValuePair<long, int> pair in manifest.Components )
          {
-            ListViewItem item = theListView.Items.Add( Db.SelectCraftingComponentById( pair.Key ).Name );
-            item.SubItems.Add( pair.Value.ToString() );
-            item.BackColor = Color.LightPink;
+            items.Add( new ManifestItem { Item = Db.GetItemName( pair.Key ), Count = pair.Value, } );
+         }
+
+         foreach ( ManifestItem item in items.OrderBy( i => i.Item ) )
+         {
+            ListViewItem viewItem = theListView.Items.Add( item.Item );
+            viewItem.SubItems.Add( item.Count.ToString() );
+            viewItem.BackColor = Color.LightPink;
          }
       }
 
